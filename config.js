@@ -3,7 +3,7 @@
 window.FIREBASE_CONFIG = {
   apiKey: "apiKey",
   authDomain: "authDomain",
-  projectId: "projectID",
+  projectId: "grocery-list-34caa",
   storageBucket: "storageBucket",
   messagingSenderId: "messagingSenderId",
   appId: "appId"
