@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Groceries</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Groceries">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F2F5EA">
+<style>
+:root{--bg:#F2F5EA;--card:#fff;--ink:#1B2A21;--mute:#667569;--line:#DCE3D3;--green:#2E6B4E;--sticker:#FFD84D;--onst:#3A2E00;--tint:#E3EEDD}
+@media(prefers-color-scheme:dark){:root{--bg:#121A15;--card:#1B261F;--ink:#E8EFE6;--mute:#93A399;--line:#2B3A31;--green:#6CC59A;--tint:#22342A}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:17px ui-rounded,"SF Pro Rounded",system-ui,sans-serif}
+body{padding:env(safe-area-inset-top) 14px calc(env(safe-area-inset-bottom) + 84px);max-width:600px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 2px 10px}
+h1{font-size:32px;margin:0;letter-spacing:-.02em}
+.sync{border:0;background:none;color:var(--mute);font:inherit;font-size:14px;padding:6px 0}
+.sync::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mute);margin-right:6px}
+.sync.synced::before{background:var(--green)}.sync.saving::before{background:var(--sticker)}.sync.error::before{background:#D6453D}
+h2{font-size:20px;margin:22px 2px 0;letter-spacing:-.01em}
+h3{font-size:14px;font-weight:600;color:var(--green);margin:12px 4px 6px}
+ul{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+li{display:flex;align-items:center;gap:12px;padding:0 8px 0 14px;min-height:52px;border-bottom:1px solid var(--line)}
+li:last-child{border:0}
+.tick{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--green);background:none;padding:0;color:var(--bg);font-size:16px;display:grid;place-items:center}
+.on .tick,.done .tick{background:var(--green)}
+.on .tick::after,.done .tick::after{content:"✓"}
+.txt{flex:1;padding:14px 0;overflow-wrap:anywhere}
+.def,.qty{color:var(--mute);font-size:15px;white-space:nowrap}
+.qty{color:var(--ink);font-weight:700;font-size:17px;padding-right:6px}
+.done .txt,.done .qty{color:var(--mute);text-decoration:line-through;font-weight:400}
+li.on{background:var(--tint)}
+.step{display:flex;align-items:center;gap:2px;white-space:nowrap}
+.step button{width:34px;height:34px;border-radius:50%;border:0;background:var(--card);color:var(--ink);font-size:20px;padding:0}
+.step b{min-width:46px;text-align:center;font-size:16px}
+.ed{border:0;background:none;color:var(--mute);font-size:18px;padding:10px 8px}
+.tools{display:flex;gap:8px}
+input,select{font:inherit;font-size:17px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:100%}
+.tools input{flex:1;min-width:0}
+input:focus-visible,button:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.btn{border:0;border-radius:12px;background:var(--sticker);color:var(--onst);font:inherit;font-weight:700;padding:0 16px;white-space:nowrap;min-height:46px}
+.btn.alt{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.del{background:none;color:#D6453D}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px}
+.seg{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;font:inherit;font-size:16px;padding:8px 14px}
+.seg.on{background:var(--green);border-color:var(--green);color:var(--bg)}
+.seg small{opacity:.7;margin-left:4px}
+.empty{text-align:center;color:var(--mute);padding:56px 12px;line-height:1.5}
+.link{display:block;margin:18px auto 0;border:0;background:none;color:var(--mute);font:inherit;font-size:15px;text-decoration:underline;padding:10px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;background:var(--bg);border-top:1px solid var(--line);padding:6px 14px calc(env(safe-area-inset-bottom) + 6px)}
+nav button{flex:1;border:0;background:none;color:var(--mute);font:inherit;font-weight:600;padding:12px;border-radius:12px}
+nav button.on{background:var(--tint);color:var(--green)}
+nav b{background:var(--sticker);color:var(--onst);border-radius:999px;padding:1px 8px;font-size:14px;margin-left:4px}
+nav b:empty{display:none}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;z-index:5}
+.sheet[hidden]{display:none}
+.sheet form{background:var(--bg);width:100%;max-width:600px;margin:0 auto;border-radius:20px 20px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom) + 16px);display:grid;gap:10px;max-height:92%;overflow:auto}
+.sheet label{font-size:14px;color:var(--mute);display:grid;gap:4px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.acts .btn{flex:1}
+.rn{border:0;background:none;color:var(--mute);font:inherit;font-size:13px;font-weight:400;margin-left:8px;text-decoration:underline;padding:4px}
+#print{display:none}
+@page{size:letter;margin:.35in}
+@media print{
+html,body{background:#fff!important;color:#000!important}
+body{padding:0;max-width:none}
+body>*:not(#print){display:none!important}
+#print{display:block;font:9.5pt/1.25 system-ui,sans-serif}
+.ps{height:5in;overflow:hidden;border-bottom:1px dashed #888;margin-bottom:.1in;break-inside:avoid;page-break-inside:avoid}
+.ph{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1.5pt solid #000;margin-bottom:5pt;padding-bottom:2pt}
+.ph b{font-size:14pt}
+.pc{column-gap:.25in}
+.pc h4{margin:6pt 0 2pt;font-size:8.5pt;text-transform:uppercase;letter-spacing:.04em;break-after:avoid}
+.pi{display:flex;gap:5pt;align-items:baseline;break-inside:avoid}
+.pi i{flex:none;width:8pt;height:8pt;border:1pt solid #000}
+.pi span{flex:1}.pi em{font-style:normal;font-weight:700}
+}
+</style>
+</head>
+<body>
+<header><h1 id="ttl"></h1><button class="sync" id="sync"></button></header>
+<main id="main"></main>
+<nav><button data-v="pick">Pick</button><button data-v="shop">Shop<b id="badge"></b></button></nav>
+<div id="print"></div>
+<div class="sheet" id="sheet" hidden>
+<form id="f" autocomplete="off">
+<h2 id="sh" style="margin:0"></h2>
+<label>Item<input id="nm" required placeholder="e.g. Greek yogurt"></label>
+<div class="row"><label>Store<select id="st"></select><input id="stn" placeholder="New store name" hidden></label><label>Section<select id="ai"></select><input id="ain" placeholder="New section name" hidden></label></div>
+<div class="row"><label>Usual amount<input id="qt" inputmode="decimal" placeholder="1"></label><label>Unit<input id="un" list="dl-un" placeholder="g, kg, L, pack"></label></div>
+<datalist id="dl-un"><option value="g"><option value="kg"><option value="lb"><option value="oz"><option value="ml"><option value="L"><option value="pack"><option value="dozen"></datalist>
+<div class="acts"><button class="btn" type="submit">Save</button><button class="btn alt" type="submit" id="more">Save and add another</button><button class="btn alt" type="button" id="cx">Cancel</button><button class="btn del" type="button" id="dl">Delete</button></div>
+</form>
+</div>
+<script src="config.js"></script>
+<script src="seed.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const nat=(a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"});
+const STEP={g:50,ml:50,kg:.5,L:.5,l:.5,lb:.5},step=u=>STEP[u]??1;
+const num=q=>{q=parseFloat(q);return isNaN(q)?"":+q.toFixed(2)};
+const fmt=(q,u)=>[num(q),u].filter(x=>x!=="").join(" ");
+const key=i=>i.store||"No store",ais=i=>i.aisle||"Other";
+const LABEL={local:"Not synced",saving:"Saving…",offline:"Offline",synced:"Synced",error:"Sync error"};
+let S={catalog:{},trip:{}},view=localStorage.getItem("v")||"pick",flt="",shopStore="",q="",editing=null,more=false,ref=null,status="local",lastS="",lastA="";
+try{const c=JSON.parse(localStorage.getItem("g2"));if(c)S={catalog:c.catalog||{},trip:c.trip||{}}}catch(e){}
+const cache=()=>{try{localStorage.setItem("g2",JSON.stringify(S))}catch(e){}};
+const items=()=>Object.entries(S.catalog).map(([id,c])=>({id,...c}));
+function group(a){const g={};for(const i of a)((g[key(i)]??={})[ais(i)]??=[]).push(i);return g}
+const canon=(f,v)=>{v=v.trim();return Object.values(S.catalog).map(c=>c[f]).find(x=>x&&x.toLowerCase()===v.toLowerCase())||v};
+
+function apply(ch){
+  for(const[p,v]of Object.entries(ch)){const[t,i]=p.split(".");v===undefined?delete S[t][i]:S[t][i]=v}
+  cache();render();
+  if(ref){const D=firebase.firestore.FieldValue.delete(),o={};for(const[p,v]of Object.entries(ch))o[p]=v===undefined?D:v;ref.update(o).catch(()=>{})}
+}
+
+function row(i){
+  const t=S.trip[i.id],d=`data-id="${i.id}"`;
+  return `<li class="${t?"on":""}"><button class="tick" data-act="tog" ${d} aria-label="Toggle ${esc(i.name)}"></button><span class="txt" data-act="tog" ${d}>${esc(i.name)}</span>`+
+  (t?`<span class="step"><button data-act="dec" ${d} aria-label="Less">−</button><b>${fmt(t.qty,t.unit)}</b><button data-act="inc" ${d} aria-label="More">+</button></span>`:`<span class="def">${fmt(i.qty,i.unit)}</span>`)+
+  `<button class="ed" data-act="edit" ${d} aria-label="Edit ${esc(i.name)}">✎</button></li>`;
+}
+function pickHtml(){
+  const all=items(),stores=[...new Set(all.map(key))].sort(nat);
+  if(flt&&!stores.includes(flt))flt="";
+  let h=`<div class="tools"><input id="q" type="search" placeholder="Search items" value="${esc(q)}"><button class="btn" data-act="new">New item</button></div>`;
+  if(stores.length>1)h+=`<div class="chips">`+["",...stores].map(s=>`<button class="seg ${s===flt?"on":""}" data-act="flt" data-v="${esc(s)}">${esc(s||"All")}</button>`).join("")+`</div>`;
+  if(!all.length)return h+`<div class="empty">Your catalog is empty.<br>Tap New item to add the first one.</div>`;
+  const f=all.filter(i=>(!flt||key(i)===flt)&&i.name.toLowerCase().includes(q.trim().toLowerCase()));
+  if(!f.length)return h+`<div class="empty">No matches.</div>`;
+  const g=group(f);
+  for(const s of Object.keys(g).sort(nat)){
+    h+=`<h2>${esc(s)}<button class="rn" data-act="rn" data-s="${esc(s)}" data-v="">Rename</button></h2>`;
+    for(const a of Object.keys(g[s]).sort(nat))h+=`<h3>${esc(a)}<button class="rn" data-act="rn" data-s="${esc(s)}" data-v="${esc(a)}">Rename</button></h3><ul>`+g[s][a].sort((x,y)=>nat(x.name,y.name)).map(row).join("")+`</ul>`;
+  }
+  return h;
+}
+function shopHtml(){
+  const rows=Object.entries(S.trip).filter(([id])=>S.catalog[id]).map(([id,t])=>({id,...S.catalog[id],...t}));
+  if(!rows.length)return `<div class="empty">Nothing to buy yet.<br>Check items off on the Pick tab.</div>`;
+  const stores=[...new Set(rows.map(key))].sort(nat);
+  if(!stores.includes(shopStore))shopStore=stores[0];
+  let h=`<div class="chips">`+stores.map(s=>`<button class="seg ${s===shopStore?"on":""}" data-act="shopst" data-v="${esc(s)}">${esc(s)}<small>${rows.filter(r=>key(r)===s&&!r.got).length}</small></button>`).join("")+`</div>`;
+  const mine=rows.filter(r=>key(r)===shopStore),g=group(mine)[shopStore];
+  for(const a of Object.keys(g).sort(nat))h+=`<h3>${esc(a)}</h3><ul>`+g[a].sort((x,y)=>(!!x.got-!!y.got)||nat(x.name,y.name)).map(r=>`<li class="${r.got?"done":""}" data-act="got" data-id="${r.id}" role="button" tabindex="0"><span class="tick"></span><span class="txt">${esc(r.name)}</span><b class="qty">${fmt(r.qty,r.unit)}</b></li>`).join("")+`</ul>`;
+  if(mine.some(r=>r.got))h+=`<button class="link" data-act="clrgot">Remove bought items from ${esc(shopStore)}</button>`;
+  return h+`<button class="link" data-act="print">Print lists (half page per store)</button><button class="link" data-act="clrall">Clear the whole trip</button>`;
+}
+function printHtml(){
+  const rows=Object.entries(S.trip).filter(([id,t])=>S.catalog[id]&&!t.got).map(([id,t])=>({id,...S.catalog[id],...t}));
+  const d=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
+  return [...new Set(rows.map(key))].sort(nat).map(s=>{
+    const g=group(rows.filter(r=>key(r)===s))[s],as=Object.keys(g).sort(nat);
+    const n=as.length+as.reduce((x,k)=>x+g[k].length,0),cols=Math.min(4,Math.ceil(n/24)||1);
+    return `<section class="ps"><div class="ph"><b>${esc(s)}</b><span>${d}</span></div><div class="pc" style="column-count:${cols}">`+as.map(a=>`<h4>${esc(a)}</h4>`+g[a].sort((x,y)=>nat(x.name,y.name)).map(r=>`<div class="pi"><i></i><span>${esc(r.name)}</span><em>${fmt(r.qty,r.unit)}</em></div>`).join("")).join("")+`</div></section>`;
+  }).join("");
+}
+function render(){
+  const foc=document.activeElement&&document.activeElement.id==="q";
+  $("#ttl").textContent=view==="pick"?"Pick items":"Shopping";
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
+  $("#badge").textContent=Object.entries(S.trip).filter(([id,t])=>S.catalog[id]&&!t.got).length||"";
+  const s=$("#sync");s.className="sync "+status;s.textContent=LABEL[status];
+  $("#main").innerHTML=view==="pick"?pickHtml():shopHtml();
+  $("#print").innerHTML=printHtml();
+  if(foc){const e=$("#q");e.focus();e.setSelectionRange(e.value.length,e.value.length)}
+}
+
+$("#main").addEventListener("input",e=>{if(e.target.id==="q"){q=e.target.value;render()}});
+$("#main").addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;
+  const a=b.dataset.act,id=b.dataset.id,c=S.catalog[id],t=S.trip[id];
+  if(a==="tog")apply({["trip."+id]:t?undefined:{qty:c.qty,unit:c.unit||"",got:false}});
+  else if(a==="inc"||a==="dec"){const n=+((+t.qty||0)+(a==="inc"?1:-1)*step(t.unit)).toFixed(2);apply({["trip."+id]:n>0?{...t,qty:n}:undefined})}
+  else if(a==="edit")openSheet(id);
+  else if(a==="new")openSheet();
+  else if(a==="got")apply({["trip."+id]:{...t,got:!t.got}});
+  else if(a==="flt"){flt=b.dataset.v;render()}
+  else if(a==="shopst"){shopStore=b.dataset.v;render()}
+  else if(a==="print")window.print();
+  else if(a==="rn"){
+    const st=b.dataset.s,sec=b.dataset.v,cur=sec||st;
+    const nn=(prompt(sec?`Rename section "${sec}" (${st})`:`Rename store "${st}"`,cur)||"").trim();
+    if(!nn||nn===cur)return;
+    const ch={};
+    for(const[i,c]of Object.entries(S.catalog)){
+      if(sec){if(key(c)===st&&ais(c)===sec)ch["catalog."+i]={...c,aisle:nn}}
+      else if(key(c)===st)ch["catalog."+i]={...c,store:nn};
+    }
+    apply(ch);
+  }
+  else if(a==="clrgot"){const ch={};for(const[i,x]of Object.entries(S.trip))if(x.got&&S.catalog[i]&&key(S.catalog[i])===shopStore)ch["trip."+i]=undefined;apply(ch)}
+  else if(a==="clrall"&&confirm("Clear the whole trip list?")){const ch={};for(const i in S.trip)ch["trip."+i]=undefined;apply(ch)}
+});
+$("nav").onclick=e=>{const b=e.target.closest("button");if(b){view=b.dataset.v;try{localStorage.setItem("v",view)}catch(x){}render();scrollTo(0,0)}};
+$("#sync").onclick=()=>{
+  if(status==="local")alert("Sharing isn't set up yet, so this list only lives on this phone. Add your Firebase details to config.js to sync it.");
+  else if(status==="error")alert("Couldn't reach the shared list. Check your connection and your Firestore rules.");
+};
+
+const NEW="__new";
+function fillSel(sel,vals,cur){
+  vals=[...new Set(vals.filter(Boolean))].sort(nat);
+  if(cur&&!vals.includes(cur))vals.push(cur);
+  sel.innerHTML=vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("")+`<option value="${NEW}">＋ New…</option>`;
+  sel.value=cur===""?NEW:cur&&vals.includes(cur)?cur:vals[0]||NEW;
+}
+function syncNew(){$("#stn").hidden=$("#st").value!==NEW;$("#ain").hidden=$("#ai").value!==NEW}
+function fillSecs(keep){
+  const st=$("#st").value;
+  fillSel($("#ai"),st===NEW?[]:Object.values(S.catalog).filter(c=>key(c)===st).map(ais),keep);
+  syncNew();
+}
+function openSheet(id){
+  editing=id||null;
+  const c=id?S.catalog[id]:{name:"",qty:1,unit:""};
+  $("#sh").textContent=id?"Edit item":"New item";
+  $("#nm").value=c.name;$("#qt").value=c.qty??"";$("#un").value=c.unit||"";$("#stn").value="";$("#ain").value="";
+  fillSel($("#st"),Object.values(S.catalog).map(x=>x.store),id?(c.store||""):lastS||undefined);
+  fillSecs(id?(c.aisle||"Other"):lastA||undefined);
+  $("#dl").hidden=!id;$("#more").hidden=!!id;
+  $("#sheet").hidden=false;if(!id)$("#nm").focus();
+}
+const closeSheet=()=>{$("#sheet").hidden=true;editing=null};
+$("#st").onchange=()=>{fillSecs();if($("#st").value===NEW)$("#stn").focus()};
+$("#ai").onchange=()=>{syncNew();if($("#ai").value===NEW)$("#ain").focus()};
+$("#more").onclick=()=>{more=true};
+$("#cx").onclick=closeSheet;
+$("#sheet").onclick=e=>{if(e.target.id==="sheet")closeSheet()};
+$("#dl").onclick=()=>{if(confirm("Delete "+S.catalog[editing].name+"?")){apply({["catalog."+editing]:undefined,["trip."+editing]:undefined});closeSheet()}};
+$("#f").onsubmit=e=>{
+  e.preventDefault();
+  const name=$("#nm").value.trim(),store=($("#st").value===NEW?$("#stn").value:$("#st").value).trim();
+  if(!name||!store){more=false;if(!store){$("#stn").hidden=false;$("#stn").focus()}return}
+  const aisle=($("#ai").value===NEW?$("#ain").value:$("#ai").value).trim()||"Other";
+  const id=editing||Math.random().toString(36).slice(2,10);
+  const it={name,store:canon("store",store),aisle:canon("aisle",aisle),qty:parseFloat($("#qt").value)||1,unit:$("#un").value.trim()};
+  lastS=it.store;lastA=it.aisle;
+  apply({["catalog."+id]:it});
+  if(more&&!editing){$("#nm").value="";$("#stn").value="";$("#ain").value="";fillSel($("#st"),Object.values(S.catalog).map(c=>c.store),it.store);fillSecs(it.aisle);$("#nm").focus()}else closeSheet();
+  more=false;
+};
+
+const seedTop=()=>Math.max(0,...(window.SEED||[]).map(b=>b.v));
+function seedItems(from){
+  const have=new Set(Object.values(S.catalog).map(c=>((c.store||"")+"|"+c.name).toLowerCase())),ch={};
+  for(const b of window.SEED||[])if(b.v>from){let n=0;for(const[s,a,ns]of b.items)for(const nm of ns){n++;const k=(s+"|"+nm).toLowerCase();if(!have.has(k)){have.add(k);ch["catalog.s"+b.v+"_"+n]={name:nm,store:s,aisle:a,qty:1,unit:""}}}}
+  return ch;
+}
+function seedLocal(){
+  const done=+localStorage.getItem("seedv")||(localStorage.getItem("seeded")?1:0);
+  if(!window.SEED||done>=seedTop())return;
+  try{localStorage.setItem("seedv",seedTop())}catch(e){}
+  apply(seedItems(done));
+}
+const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+async function initSync(){
+  const c=window.FIREBASE_CONFIG,id=window.LIST_ID;
+  if(!c||!c.apiKey||c.apiKey.startsWith("PASTE")||!id)return seedLocal();
+  try{
+    const v="https://www.gstatic.com/firebasejs/10.12.2/firebase-";
+    await loadScript(v+"app-compat.js");await loadScript(v+"firestore-compat.js");
+    firebase.initializeApp(c);
+    const db=firebase.firestore();
+    try{await db.enablePersistence({synchronizeTabs:true})}catch(e){}
+    ref=db.collection("lists").doc(id);
+    ref.set({catalog:{},trip:{}},{merge:true}).catch(()=>{});
+    status="offline";
+    ref.onSnapshot({includeMetadataChanges:true},snap=>{
+      const d=snap.data()||{};
+      S={catalog:d.catalog||{},trip:d.trip||{}};cache();
+      const done=d.seedv??(d.seeded?1:0);
+      if(!snap.metadata.fromCache&&window.SEED&&done<seedTop()){ref.update({seedv:seedTop()}).catch(()=>{});apply(seedItems(done))}
+      status=snap.metadata.hasPendingWrites?"saving":snap.metadata.fromCache?"offline":"synced";
+      render();
+    },()=>{status="error";render()});
+  }catch(e){status="offline";render()}
+}
+render();initSync();
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
