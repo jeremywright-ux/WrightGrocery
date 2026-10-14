@@ -282,7 +282,7 @@ async function initSync(){
     db.settings({experimentalAutoDetectLongPolling:true,merge:true});
     try{await db.enablePersistence({synchronizeTabs:true})}catch(e){}
     ref=db.collection("lists").doc(id);
-    ref.set({catalog:{},trip:{}},{merge:true}).catch(fail);
+    ref.set({init:true},{merge:true}).catch(fail);
     status="offline";
     ref.onSnapshot({includeMetadataChanges:true},snap=>{
       const d=snap.data()||{};
