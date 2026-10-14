@@ -142,7 +142,7 @@ function pickHtml(){
     h+=`<h2>${esc(s)}<button class="rn" data-act="rn" data-s="${esc(s)}" data-v="">Rename</button></h2>`;
     for(const a of Object.keys(g[s]).sort(nat))h+=`<h3>${esc(a)}<button class="rn" data-act="rn" data-s="${esc(s)}" data-v="${esc(a)}">Rename</button></h3><ul>`+g[s][a].sort((x,y)=>nat(x.name,y.name)).map(row).join("")+`</ul>`;
   }
-  return h;
+  return h+`<button class="link" data-act="copyseed">Copy catalog as a new seed.js</button>`;
 }
 function shopHtml(){
   const rows=Object.entries(S.trip).filter(([id])=>S.catalog[id]).map(([id,t])=>({id,...S.catalog[id],...t}));
@@ -154,6 +154,12 @@ function shopHtml(){
   for(const a of Object.keys(g).sort(nat))h+=`<h3>${esc(a)}</h3><ul>`+g[a].sort((x,y)=>(!!x.got-!!y.got)||nat(x.name,y.name)).map(r=>`<li class="${r.got?"done":""}" data-act="got" data-id="${r.id}" role="button" tabindex="0"><span class="tick"></span><span class="txt">${esc(r.name)}</span><b class="qty">${fmt(r.qty,r.unit)}</b></li>`).join("")+`</ul>`;
   if(mine.some(r=>r.got))h+=`<button class="link" data-act="clrgot">Remove bought items from ${esc(shopStore)}</button>`;
   return h+`<button class="link" data-act="print">Print lists (half page per store)</button><button class="link" data-act="clrall">Clear the whole trip</button>`;
+}
+function seedText(){
+  const g=group(items()),rows=[];
+  for(const s of Object.keys(g).sort(nat))for(const a of Object.keys(g[s]).sort(nat))
+    rows.push(JSON.stringify([s,a,g[s][a].sort((x,y)=>nat(x.name,y.name)).map(i=>(+i.qty===1&&!i.unit)?i.name:[i.name,+i.qty,i.unit||""])]));
+  return "// Starter catalog (copied from the app). Loaded once into a brand new list.\nwindow.SEED=[\n{v:1,items:[\n"+rows.join(",\n")+"\n]}\n];\n";
 }
 function printHtml(){
   const rows=Object.entries(S.trip).filter(([id,t])=>S.catalog[id]&&!t.got).map(([id,t])=>({id,...S.catalog[id],...t}));
@@ -186,6 +192,7 @@ $("#main").addEventListener("click",e=>{
   else if(a==="got")apply({["trip."+id]:{...t,got:!t.got}});
   else if(a==="flt"){flt=b.dataset.v;render()}
   else if(a==="shopst"){shopStore=b.dataset.v;render()}
+  else if(a==="copyseed"){const t=seedText();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>alert("Copied. On GitHub, open seed.js, click the pencil, select all, paste, then commit.")).catch(()=>prompt("Copy this text into seed.js:",t))}
   else if(a==="seed"){apply(seedItems(0));if(ref)ref.update({seedv:seedTop()}).catch(fail);try{localStorage.setItem("seedv",seedTop())}catch(e){}}
   else if(a==="print")window.print();
   else if(a==="rn"){
@@ -205,7 +212,7 @@ $("#main").addEventListener("click",e=>{
 $("nav").onclick=e=>{const b=e.target.closest("button");if(b){view=b.dataset.v;try{localStorage.setItem("v",view)}catch(x){}render();scrollTo(0,0)}};
 $("#sync").onclick=()=>{
   if(status==="local")alert("Sharing isn't set up yet, so this list only lives on this phone. Add your Firebase details to config.js to sync it.");
-  else alert(lastErr?"Sync problem:\n"+lastErr:"Status: "+LABEL[status]);
+  else alert(lastErr?"Sync problem:\n"+lastErr:status==="saving"?"Your latest changes are still waiting to reach Firebase. If this stays on Saving for more than a few seconds, an ad or tracker blocker, VPN, antivirus or network filter may be blocking it, or you may be offline. Changes made now can be lost if you reload.":"Status: "+LABEL[status]);
 };
 
 const NEW="__new";
@@ -254,7 +261,7 @@ $("#f").onsubmit=e=>{
 const seedTop=()=>Math.max(0,...(window.SEED||[]).map(b=>b.v));
 function seedItems(from){
   const have=new Set(Object.values(S.catalog).map(c=>((c.store||"")+"|"+c.name).toLowerCase())),ch={};
-  for(const b of window.SEED||[])if(b.v>from){let n=0;for(const[s,a,ns]of b.items)for(const nm of ns){n++;const k=(s+"|"+nm).toLowerCase();if(!have.has(k)){have.add(k);ch["catalog.s"+b.v+"_"+n]={name:nm,store:s,aisle:a,qty:1,unit:""}}}}
+  for(const b of window.SEED||[])if(b.v>from){let n=0;for(const[s,a,ns]of b.items)for(const x of ns){n++;const[nm,q=1,u=""]=Array.isArray(x)?x:[x],id="s"+b.v+"_"+n,k=(s+"|"+nm).toLowerCase();if(!have.has(k)&&!S.catalog[id]){have.add(k);ch["catalog."+id]={name:nm,store:s,aisle:a,qty:q,unit:u}}}}
   return ch;
 }
 function seedLocal(){
@@ -272,6 +279,7 @@ async function initSync(){
     await loadScript(v+"app-compat.js");await loadScript(v+"firestore-compat.js");
     firebase.initializeApp(c);
     const db=firebase.firestore();
+    db.settings({experimentalAutoDetectLongPolling:true,merge:true});
     try{await db.enablePersistence({synchronizeTabs:true})}catch(e){}
     ref=db.collection("lists").doc(id);
     ref.set({catalog:{},trip:{}},{merge:true}).catch(fail);
