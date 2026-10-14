@@ -134,7 +134,7 @@ function pickHtml(){
   if(flt&&!stores.includes(flt))flt="";
   let h=`<div class="tools"><input id="q" type="search" placeholder="Search items" value="${esc(q)}"><button class="btn" data-act="new">New item</button></div>`;
   if(stores.length>1)h+=`<div class="chips">`+["",...stores].map(s=>`<button class="seg ${s===flt?"on":""}" data-act="flt" data-v="${esc(s)}">${esc(s||"All")}</button>`).join("")+`</div>`;
-  if(!all.length)return h+`<div class="empty">Your catalog is empty.<br>Tap New item to add the first one.</div>`;
+  if(!all.length)return h+`<div class="empty">Your catalog is empty.<br>`+(window.SEED?`<button class="btn" data-act="seed" style="margin:14px 0">Load starter list</button><br>`:`<br>The starter file seed.js didn't load. Check it is uploaded next to index.html on GitHub.<br><br>`)+`Or tap New item to add one yourself.</div>`;
   const f=all.filter(i=>(!flt||key(i)===flt)&&i.name.toLowerCase().includes(q.trim().toLowerCase()));
   if(!f.length)return h+`<div class="empty">No matches.</div>`;
   const g=group(f);
@@ -186,6 +186,7 @@ $("#main").addEventListener("click",e=>{
   else if(a==="got")apply({["trip."+id]:{...t,got:!t.got}});
   else if(a==="flt"){flt=b.dataset.v;render()}
   else if(a==="shopst"){shopStore=b.dataset.v;render()}
+  else if(a==="seed"){apply(seedItems(0));if(ref)ref.update({seedv:seedTop()}).catch(fail);try{localStorage.setItem("seedv",seedTop())}catch(e){}}
   else if(a==="print")window.print();
   else if(a==="rn"){
     const st=b.dataset.s,sec=b.dataset.v,cur=sec||st;
