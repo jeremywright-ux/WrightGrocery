@@ -109,17 +109,18 @@ const num=q=>{q=parseFloat(q);return isNaN(q)?"":+q.toFixed(2)};
 const fmt=(q,u)=>[num(q),u].filter(x=>x!=="").join(" ");
 const key=i=>i.store||"No store",ais=i=>i.aisle||"Other";
 const LABEL={local:"Not synced",saving:"Saving…",offline:"Offline",synced:"Synced",error:"Sync error"};
-let S={catalog:{},trip:{}},view=localStorage.getItem("v")||"pick",flt="",shopStore="",q="",editing=null,more=false,ref=null,status="local",lastS="",lastA="";
+let lastErr="",tried=false,S={catalog:{},trip:{}},view=localStorage.getItem("v")||"pick",flt="",shopStore="",q="",editing=null,more=false,ref=null,status="local",lastS="",lastA="";
 try{const c=JSON.parse(localStorage.getItem("g2"));if(c)S={catalog:c.catalog||{},trip:c.trip||{}}}catch(e){}
 const cache=()=>{try{localStorage.setItem("g2",JSON.stringify(S))}catch(e){}};
 const items=()=>Object.entries(S.catalog).map(([id,c])=>({id,...c}));
 function group(a){const g={};for(const i of a)((g[key(i)]??={})[ais(i)]??=[]).push(i);return g}
 const canon=(f,v)=>{v=v.trim();return Object.values(S.catalog).map(c=>c[f]).find(x=>x&&x.toLowerCase()===v.toLowerCase())||v};
 
+const fail=e=>{lastErr=((e&&e.code)||"error")+": "+((e&&e.message)||"");status="error";render()};
 function apply(ch){
   for(const[p,v]of Object.entries(ch)){const[t,i]=p.split(".");v===undefined?delete S[t][i]:S[t][i]=v}
   cache();render();
-  if(ref){const D=firebase.firestore.FieldValue.delete(),o={};for(const[p,v]of Object.entries(ch))o[p]=v===undefined?D:v;ref.update(o).catch(()=>{})}
+  if(ref){const D=firebase.firestore.FieldValue.delete(),o={};for(const[p,v]of Object.entries(ch))o[p]=v===undefined?D:v;ref.update(o).catch(fail)}
 }
 
 function row(i){
@@ -203,7 +204,7 @@ $("#main").addEventListener("click",e=>{
 $("nav").onclick=e=>{const b=e.target.closest("button");if(b){view=b.dataset.v;try{localStorage.setItem("v",view)}catch(x){}render();scrollTo(0,0)}};
 $("#sync").onclick=()=>{
   if(status==="local")alert("Sharing isn't set up yet, so this list only lives on this phone. Add your Firebase details to config.js to sync it.");
-  else if(status==="error")alert("Couldn't reach the shared list. Check your connection and your Firestore rules.");
+  else alert(lastErr?"Sync problem:\n"+lastErr:"Status: "+LABEL[status]);
 };
 
 const NEW="__new";
@@ -272,16 +273,16 @@ async function initSync(){
     const db=firebase.firestore();
     try{await db.enablePersistence({synchronizeTabs:true})}catch(e){}
     ref=db.collection("lists").doc(id);
-    ref.set({catalog:{},trip:{}},{merge:true}).catch(()=>{});
+    ref.set({catalog:{},trip:{}},{merge:true}).catch(fail);
     status="offline";
     ref.onSnapshot({includeMetadataChanges:true},snap=>{
       const d=snap.data()||{};
       S={catalog:d.catalog||{},trip:d.trip||{}};cache();
       const done=d.seedv??(d.seeded?1:0);
-      if(!snap.metadata.fromCache&&window.SEED&&done<seedTop()){ref.update({seedv:seedTop()}).catch(()=>{});apply(seedItems(done))}
-      status=snap.metadata.hasPendingWrites?"saving":snap.metadata.fromCache?"offline":"synced";
+      if(!snap.metadata.fromCache&&window.SEED&&!tried&&done<seedTop()){tried=true;ref.update({seedv:seedTop()}).catch(fail);apply(seedItems(done))}
+      status=lastErr?"error":snap.metadata.hasPendingWrites?"saving":snap.metadata.fromCache?"offline":"synced";
       render();
-    },()=>{status="error";render()});
+    },fail);
   }catch(e){status="offline";render()}
 }
 render();initSync();
