@@ -11,7 +11,9 @@ window.SEED=[
 ["Costco","6. Frozen",["Bacon","Corn Dogs","Fries","Ready Crisp"]],
 ["Costco","7. Drinks",["Blue Monkey","Bubbly","Pop","Sparkling Water"]],
 ["Costco","8. Pantry",["Almond Milk","Raisin Bran","Cheerios","All Bran","Chips","Chia","Croutons","Jam","Ketchup","Nachos","Olive Oil","Panko","Pretzels","Syrup","Gogo Squeeze","Mandarins"]],
-["Superstore","1. a) Produce",["Bananas","Broccoli","Carrots","Cauliflower","Celery","Cilantro","Cucumber","Fennel","Fruit","Green Leaf Lettuce","Green Onion","Head Lettuce","Jalapeño","Lemons","Limes","Mint (fresh)","Mushrooms","Peppers","Red Leaf Lettuce","Thyme - fresh"]],
+]}
+  {v:2,items:[
+    ["Superstore","1. a) Produce",["Bananas","Broccoli","Carrots","Cauliflower","Celery","Cilantro","Cucumber","Fennel","Fruit","Green Leaf Lettuce","Green Onion","Head Lettuce","Jalapeño","Lemons","Limes","Mint (fresh)","Mushrooms","Peppers","Red Leaf Lettuce","Thyme - fresh"]],
 ["Superstore","1. b) Produce",["Arugula","Basil - fresh","Garlic","Onion - Red","Onion - White","Onion - Yellow","Romaine","Snap Peas","Spinach","Tomato - cherry","Tomato - regular"]],
 ["Superstore","2. Supplies",["Compost Bags","Garbage Bags - Bathroom","Laundry Pods","Light Bulbs","Oxi-Clean"]],
 ["Superstore","3. Meat & Deli",["Boursienne Cheese","Breakfast Sausage","Cheese","Feta","Ground Beef/Pork","Hot Dogs","Shrimp","Olives","Salami","Sliced Cheese","Sliced Ham","Smokies"]],
@@ -24,4 +26,8 @@ window.SEED=[
 ["Superstore","6. Dairy & Cheese",["Buttermilk","Cream (whipping)","Cream Cheese Spread","Flavoured Yogurt","Orange Juice","Plain Yogurt","Shredded Cheese - Mozza","Shredded Cheese - Nacho/Mix","Sour Cream"]],
 ["Superstore","7. Bakery",["Bagels","Dinner Buns","English Muffins","French Bread","Hamburger Buns","HD Buns","Naan","Sour Dough","Wraps","WW Bread"]]
 ]}
+{v:3,items:[
+  ["Italian Centre","1. Deli",["Parm","Olives","Deli Meat"]]
+  ["Stawnichy's","1. Any",["Cabbage Rolls - Sweet","Cabbage Rolls - Sour","Garlic Sauasage"]]
+  ]}
 ];
