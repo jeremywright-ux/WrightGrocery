@@ -66,13 +66,17 @@ nav b:empty{display:none}
 .acts .btn{flex:1}
 .rn{border:0;background:none;color:var(--mute);font:inherit;font-size:13px;font-weight:400;margin-left:8px;text-decoration:underline;padding:4px}
 #print{display:none}
-@page{size:letter;margin:.35in}
+@page{size:letter landscape;margin:.35in}
 @media print{
 html,body{background:#fff!important;color:#000!important}
 body{padding:0;max-width:none}
 body>*:not(#print){display:none!important}
 #print{display:block;font:9.5pt/1.25 system-ui,sans-serif}
-.ps{height:5in;overflow:hidden;border-bottom:1px dashed #888;margin-bottom:.1in;break-inside:avoid;page-break-inside:avoid}
+.pg{display:flex;height:7.4in;break-after:page;page-break-after:always}
+.pg:last-child{break-after:auto;page-break-after:auto}
+.ps{flex:1 1 0;min-width:0;height:100%;overflow:hidden;padding:0 .1in}
+.ps+.ps{border-left:1px dashed #888}
+.pg>.ps:only-child{flex:0 0 50%}
 .ph{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1.5pt solid #000;margin-bottom:5pt;padding-bottom:2pt}
 .ph b{font-size:14pt}
 .pc{column-gap:.25in}
@@ -153,7 +157,7 @@ function shopHtml(){
   const mine=rows.filter(r=>key(r)===shopStore),g=group(mine)[shopStore];
   for(const a of Object.keys(g).sort(nat))h+=`<h3>${esc(a)}</h3><ul>`+g[a].sort((x,y)=>(!!x.got-!!y.got)||nat(x.name,y.name)).map(r=>`<li class="${r.got?"done":""}" data-act="got" data-id="${r.id}" role="button" tabindex="0"><span class="tick"></span><span class="txt">${esc(r.name)}</span><b class="qty">${fmt(r.qty,r.unit)}</b></li>`).join("")+`</ul>`;
   if(mine.some(r=>r.got))h+=`<button class="link" data-act="clrgot">Remove bought items from ${esc(shopStore)}</button>`;
-  return h+`<button class="link" data-act="print">Print lists (half page per store)</button><button class="link" data-act="clrall">Clear the whole trip</button>`;
+  return h+`<button class="link" data-act="print">Print lists (landscape, half page per store)</button><button class="link" data-act="clrall">Clear the whole trip</button>`;
 }
 function seedText(){
   const g=group(items()),rows=[];
@@ -164,11 +168,13 @@ function seedText(){
 function printHtml(){
   const rows=Object.entries(S.trip).filter(([id,t])=>S.catalog[id]&&!t.got).map(([id,t])=>({id,...S.catalog[id],...t}));
   const d=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
-  return [...new Set(rows.map(key))].sort(nat).map(s=>{
+  const cards=[...new Set(rows.map(key))].sort(nat).map(s=>{
     const g=group(rows.filter(r=>key(r)===s))[s],as=Object.keys(g).sort(nat);
-    const n=as.length+as.reduce((x,k)=>x+g[k].length,0),cols=Math.min(4,Math.ceil(n/24)||1);
+    const n=as.length+as.reduce((x,k)=>x+g[k].length,0),cols=Math.min(3,Math.ceil(n/40)||1);
     return `<section class="ps"><div class="ph"><b>${esc(s)}</b><span>${d}</span></div><div class="pc" style="column-count:${cols}">`+as.map(a=>`<h4>${esc(a)}</h4>`+g[a].sort((x,y)=>nat(x.name,y.name)).map(r=>`<div class="pi"><i></i><span>${esc(r.name)}</span><em>${fmt(r.qty,r.unit)}</em></div>`).join("")).join("")+`</div></section>`;
-  }).join("");
+  });
+  let out="";for(let i=0;i<cards.length;i+=2)out+=`<div class="pg">`+cards.slice(i,i+2).join("")+"</div>";
+  return out;
 }
 function render(){
   const foc=document.activeElement&&document.activeElement.id==="q";
