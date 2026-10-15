@@ -24,7 +24,7 @@ window.SEED=[
 	["Superstore","5. d) Baking, Snacks, Breakfast",["WW Flour","AP Flour","Apple Sauce","Canned Pumpkin","Kashi Bars","Red Berry","All Bran","Early Grey","Chai","Orange Peko","Flax Meal"]],
 	["Superstore","5. e) Spices",["5 Spice","Allspice","Basil - dried)","Chili Powder","Cumin - ground","Cumin - seed","Curry Powder","Garlic Powder","Onion Powder","Ground Coriander","Ground Ginger","Cardamom - Ground","Mint - 	Dried","Oregano - Dried","Paprika - Regular","Paprika - Smoked","Thyme - Dried"]],
 	["Superstore","6. Frozen",["Hash Brown Patties","Shredded Hash Browns","Tater Tots","Fish Sticks","Edemame","Frozen Peas","Frozen Corn","Frozen Mango","Frozen Pinapple","Frozen Strawberries","Ice Cream","Ice Cream 	Sandwiches","Popsicles","Perogies"]],
-	["Superstore","7. Dairy & Cheese",["Buttermilk","Orange Juice","Whipping Cream","Shredded Cheese - Mozza","Shredded Cheese - Nacho/Mix","Cream Cheese Spread","Flavoured Yogurt","Plain Yogurt","Sour Cream"]],
+	["Superstore","7. Dairy & Cheese",["Buttermilk","Orange Juice","Whipping Cream","Black Diamond Cheese Strings","Shredded Cheese - Mozza","Shredded Cheese - Nacho/Mix","Cream Cheese Spread","Flavoured Yogurt","Plain Yogurt","Sour Cream"]],
 	["Superstore","8. Bakery",["French Bread","Naan","Wraps","Sour Dough","WW Bread","Dinner Buns","Hamburger Buns","HD Buns","Bagels","English Muffins"]]
 	]},
 {v:3,items:[
