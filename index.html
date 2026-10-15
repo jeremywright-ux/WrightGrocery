@@ -108,6 +108,7 @@ body>*:not(#print){display:none!important}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const nat=(a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"});
+const sOrd=(a,b)=>{const o=(window.STORE_ORDER||[]).map(x=>x.toLowerCase()),i=o.indexOf(a.toLowerCase()),j=o.indexOf(b.toLowerCase());return(i<0?1e9:i)-(j<0?1e9:j)||nat(a,b)};
 const STEP={g:50,ml:50,kg:.5,L:.5,l:.5,lb:.5},step=u=>STEP[u]??1;
 const num=q=>{q=parseFloat(q);return isNaN(q)?"":+q.toFixed(2)};
 const fmt=(q,u)=>[num(q),u].filter(x=>x!=="").join(" ");
@@ -134,7 +135,7 @@ function row(i){
   `<button class="ed" data-act="edit" ${d} aria-label="Edit ${esc(i.name)}">✎</button></li>`;
 }
 function pickHtml(){
-  const all=items(),stores=[...new Set(all.map(key))].sort(nat);
+  const all=items(),stores=[...new Set(all.map(key))].sort(sOrd);
   if(flt&&!stores.includes(flt))flt="";
   let h=`<div class="tools"><input id="q" type="search" placeholder="Search items" value="${esc(q)}"><button class="btn" data-act="new">New item</button></div>`;
   if(stores.length>1)h+=`<div class="chips">`+["",...stores].map(s=>`<button class="seg ${s===flt?"on":""}" data-act="flt" data-v="${esc(s)}">${esc(s||"All")}</button>`).join("")+`</div>`;
@@ -142,7 +143,7 @@ function pickHtml(){
   const f=all.filter(i=>(!flt||key(i)===flt)&&i.name.toLowerCase().includes(q.trim().toLowerCase()));
   if(!f.length)return h+`<div class="empty">No matches.</div>`;
   const g=group(f);
-  for(const s of Object.keys(g).sort(nat)){
+  for(const s of Object.keys(g).sort(sOrd)){
     h+=`<h2>${esc(s)}<button class="rn" data-act="rn" data-s="${esc(s)}" data-v="">Rename</button></h2>`;
     for(const a of Object.keys(g[s]).sort(nat))h+=`<h3>${esc(a)}<button class="rn" data-act="rn" data-s="${esc(s)}" data-v="${esc(a)}">Rename</button></h3><ul>`+g[s][a].sort((x,y)=>nat(x.name,y.name)).map(row).join("")+`</ul>`;
   }
@@ -151,7 +152,7 @@ function pickHtml(){
 function shopHtml(){
   const rows=Object.entries(S.trip).filter(([id])=>S.catalog[id]).map(([id,t])=>({id,...S.catalog[id],...t}));
   if(!rows.length)return `<div class="empty">Nothing to buy yet.<br>Check items off on the Pick tab.</div>`;
-  const stores=[...new Set(rows.map(key))].sort(nat);
+  const stores=[...new Set(rows.map(key))].sort(sOrd);
   if(!stores.includes(shopStore))shopStore=stores[0];
   let h=`<div class="chips">`+stores.map(s=>`<button class="seg ${s===shopStore?"on":""}" data-act="shopst" data-v="${esc(s)}">${esc(s)}<small>${rows.filter(r=>key(r)===s&&!r.got).length}</small></button>`).join("")+`</div>`;
   const mine=rows.filter(r=>key(r)===shopStore),g=group(mine)[shopStore];
@@ -161,14 +162,14 @@ function shopHtml(){
 }
 function seedText(){
   const g=group(items()),rows=[];
-  for(const s of Object.keys(g).sort(nat))for(const a of Object.keys(g[s]).sort(nat))
+  for(const s of Object.keys(g).sort(sOrd))for(const a of Object.keys(g[s]).sort(nat))
     rows.push(JSON.stringify([s,a,g[s][a].sort((x,y)=>nat(x.name,y.name)).map(i=>(+i.qty===1&&!i.unit)?i.name:[i.name,+i.qty,i.unit||""])]));
   return "// Starter catalog (copied from the app). Loaded once into a brand new list.\nwindow.SEED=[\n{v:1,items:[\n"+rows.join(",\n")+"\n]}\n];\n";
 }
 function printHtml(){
   const rows=Object.entries(S.trip).filter(([id,t])=>S.catalog[id]&&!t.got).map(([id,t])=>({id,...S.catalog[id],...t}));
   const d=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
-  const cards=[...new Set(rows.map(key))].sort(nat).map(s=>{
+  const cards=[...new Set(rows.map(key))].sort(sOrd).map(s=>{
     const g=group(rows.filter(r=>key(r)===s))[s],as=Object.keys(g).sort(nat);
     const n=as.length+as.reduce((x,k)=>x+g[k].length,0),cols=Math.min(3,Math.ceil(n/40)||1);
     return `<section class="ps"><div class="ph"><b>${esc(s)}</b><span>${d}</span></div><div class="pc" style="column-count:${cols}">`+as.map(a=>`<h4>${esc(a)}</h4>`+g[a].sort((x,y)=>nat(x.name,y.name)).map(r=>`<div class="pi"><i></i><span>${esc(r.name)}</span><em>${fmt(r.qty,r.unit)}</em></div>`).join("")).join("")+`</div></section>`;
@@ -222,8 +223,8 @@ $("#sync").onclick=()=>{
 };
 
 const NEW="__new";
-function fillSel(sel,vals,cur){
-  vals=[...new Set(vals.filter(Boolean))].sort(nat);
+function fillSel(sel,vals,cur,cmp=nat){
+  vals=[...new Set(vals.filter(Boolean))].sort(cmp);
   if(cur&&!vals.includes(cur))vals.push(cur);
   sel.innerHTML=vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("")+`<option value="${NEW}">＋ New…</option>`;
   sel.value=cur===""?NEW:cur&&vals.includes(cur)?cur:vals[0]||NEW;
@@ -239,7 +240,7 @@ function openSheet(id){
   const c=id?S.catalog[id]:{name:"",qty:1,unit:""};
   $("#sh").textContent=id?"Edit item":"New item";
   $("#nm").value=c.name;$("#qt").value=c.qty??"";$("#un").value=c.unit||"";$("#stn").value="";$("#ain").value="";
-  fillSel($("#st"),Object.values(S.catalog).map(x=>x.store),id?(c.store||""):lastS||undefined);
+  fillSel($("#st"),Object.values(S.catalog).map(x=>x.store),id?(c.store||""):lastS||undefined,sOrd);
   fillSecs(id?(c.aisle||"Other"):lastA||undefined);
   $("#dl").hidden=!id;$("#more").hidden=!!id;
   $("#sheet").hidden=false;if(!id)$("#nm").focus();
@@ -260,7 +261,7 @@ $("#f").onsubmit=e=>{
   const it={name,store:canon("store",store),aisle:canon("aisle",aisle),qty:parseFloat($("#qt").value)||1,unit:$("#un").value.trim()};
   lastS=it.store;lastA=it.aisle;
   apply({["catalog."+id]:it});
-  if(more&&!editing){$("#nm").value="";$("#stn").value="";$("#ain").value="";fillSel($("#st"),Object.values(S.catalog).map(c=>c.store),it.store);fillSecs(it.aisle);$("#nm").focus()}else closeSheet();
+  if(more&&!editing){$("#nm").value="";$("#stn").value="";$("#ain").value="";fillSel($("#st"),Object.values(S.catalog).map(c=>c.store),it.store,sOrd);fillSecs(it.aisle);$("#nm").focus()}else closeSheet();
   more=false;
 };
 
