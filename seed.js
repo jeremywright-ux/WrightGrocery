@@ -11,7 +11,7 @@ window.SEED=[
 ["Costco","6. Frozen",["Bacon","Corn Dogs","Fries","Ready Crisp"]],
 ["Costco","7. Drinks",["Blue Monkey","Bubbly","Pop","Sparkling Water"]],
 ["Costco","8. Pantry",["Almond Milk","Raisin Bran","Cheerios","All Bran","Chips","Chia","Croutons","Jam","Ketchup","Nachos","Olive Oil","Panko","Pretzels","Syrup","Gogo Squeeze","Mandarins"]],
-]}
+]},
   {v:2,items:[
     ["Superstore","1. a) Produce",["Bananas","Broccoli","Carrots","Cauliflower","Celery","Cilantro","Cucumber","Fennel","Fruit","Green Leaf Lettuce","Green Onion","Head Lettuce","Jalapeño","Lemons","Limes","Mint (fresh)","Mushrooms","Peppers","Red Leaf Lettuce","Thyme - fresh"]],
 ["Superstore","1. b) Produce",["Arugula","Basil - fresh","Garlic","Onion - Red","Onion - White","Onion - Yellow","Romaine","Snap Peas","Spinach","Tomato - cherry","Tomato - regular"]],
@@ -25,11 +25,11 @@ window.SEED=[
 ["Superstore","5. Frozen",["Frozen Mango","Frozen Pinapple","Frozen Strawberries","Hash Brown Patties","Ice Cream","Ice Cream Sandwiches","Perogies","Popsicles","Shredded Hash Browns","Tater Tots"]],
 ["Superstore","6. Dairy & Cheese",["Buttermilk","Cream (whipping)","Cream Cheese Spread","Flavoured Yogurt","Orange Juice","Plain Yogurt","Shredded Cheese - Mozza","Shredded Cheese - Nacho/Mix","Sour Cream"]],
 ["Superstore","7. Bakery",["Bagels","Dinner Buns","English Muffins","French Bread","Hamburger Buns","HD Buns","Naan","Sour Dough","Wraps","WW Bread"]]
-]}
+]},
 {v:3,items:[
   ["Italian Centre","1. Deli",["Parm","Olives","Deli Meat"]]
-  ]}
-  {v:4,items:[
+  ]},
+{v:4,items:[
   ["Stawnichy's","1. Any",["Cabbage Rolls - Sweet","Cabbage Rolls - Sour","Garlic Sausage"]]
   ]}
 ];
