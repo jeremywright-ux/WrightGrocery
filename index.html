@@ -108,7 +108,8 @@ body>*:not(#print){display:none!important}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const nat=(a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"});
-const sOrd=(a,b)=>{const o=(window.STORE_ORDER||[]).map(x=>x.toLowerCase()),i=o.indexOf(a.toLowerCase()),j=o.indexOf(b.toLowerCase());return(i<0?1e9:i)-(j<0?1e9:j)||nat(a,b)};
+const VER=12;let _ord;
+const sOrd=(a,b)=>{const o=_ord||(_ord=(window.STORE_ORDER||[...new Set((window.SEED||[]).flatMap(t=>t.items.map(x=>x[0])))]).map(x=>x.toLowerCase())),i=o.indexOf(a.toLowerCase()),j=o.indexOf(b.toLowerCase());return(i<0?1e9:i)-(j<0?1e9:j)||nat(a,b)};
 const STEP={g:50,ml:50,kg:.5,L:.5,l:.5,lb:.5},step=u=>STEP[u]??1;
 const num=q=>{q=parseFloat(q);return isNaN(q)?"":+q.toFixed(2)};
 const fmt=(q,u)=>[num(q),u].filter(x=>x!=="").join(" ");
@@ -219,7 +220,7 @@ $("#main").addEventListener("click",e=>{
 $("nav").onclick=e=>{const b=e.target.closest("button");if(b){view=b.dataset.v;try{localStorage.setItem("v",view)}catch(x){}render();scrollTo(0,0)}};
 $("#sync").onclick=()=>{
   if(status==="local")alert("Sharing isn't set up yet, so this list only lives on this phone. Add your Firebase details to config.js to sync it.");
-  else alert(lastErr?"Sync problem:\n"+lastErr:status==="saving"?"Your latest changes are still waiting to reach Firebase. If this stays on Saving for more than a few seconds, an ad or tracker blocker, VPN, antivirus or network filter may be blocking it, or you may be offline. Changes made now can be lost if you reload.":"Status: "+LABEL[status]);
+  else alert((lastErr?"Sync problem:\n"+lastErr:status==="saving"?"Your latest changes are still waiting to reach Firebase. If this stays on Saving for more than a few seconds, an ad or tracker blocker, VPN, antivirus or network filter may be blocking it, or you may be offline.":"Status: "+LABEL[status])+"\n\nApp version "+VER+"\nStore order: "+(sOrd("",""),_ord.join(", ")||"none"));
 };
 
 const NEW="__new";
