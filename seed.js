@@ -33,7 +33,7 @@ window.SEED=[
   	]},
 {v:4,items:[
   	["Stawnichy's","1. Any",["Cabbage Rolls - Sweet","Cabbage Rolls - Sour","Garlic Sausage","Licorice","Candy"]]
-	]}
+	]},
 {v:5,items:[
 	["Other","1. Items",["Amazon Hair Powder"]]
   	]}
