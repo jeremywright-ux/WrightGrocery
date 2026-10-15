@@ -11,7 +11,7 @@ window.SEED=[
 	["Costco","6. Frozen & Cooler",["Cheddar Cheese","Cheese Slice","Shredded Cheese - Nacho","Shredded Cheese - Nacho","Bacon","Ready Crisp","Fries","Corn Dogs"]],
 	["Costco","7. Drinks",["Pop","Blue Monkey","Bubbly"]],
 	["Costco","8. Pantry",["Olive Oil","Almond Milk","Raisin Bran","Cheerios","All Bran","Lemon Juice","Chia","Jam","Cheeze Whiz","Ketchup","Syrup","Panko","Croutons","Sea Salt - Coarse","Sea Salt - Fine","Garlic Bread Mix","Chips","Nachos","Chicago Mix","Pretzels","Gogo Squeeze","Mandarins"]],
-	["Costco","9. Personal",["Shampoo","Conditioner","Body Wash","Bar Soap","Toothpaste","Allergy Medecine","Vitamins"]]
+	["Costco","9. Personal",["Shampoo","Conditioner","Body Wash","Bar Soap","Toothpaste","Allergy Medecine","Vitamins"]],
 	]},
 {v:2,items:[
 	["Superstore","1. Personal",["Deodorant","Loofa","Makeup","Medicine","Tampons","Pads"]],
@@ -29,12 +29,12 @@ window.SEED=[
 	["Superstore","8. Bakery",["French Bread","Naan","Wraps","Sour Dough","WW Bread","Dinner Buns","Hamburger Buns","HD Buns","Bagels","English Muffins"]]
 	]},
 {v:3,items:[
-  	["Italian Centre","1. Deli",["Parm","Olives","Deli Meat","Licorice","Candy"]]
+  	["Italian Centre","1. Deli",["Parm","Olives","Deli Meat","Licorice","Candy"]],
   	]},
 {v:4,items:[
-  	["Stawnichy's","1. Any",["Cabbage Rolls - Sweet","Cabbage Rolls - Sour","Garlic Sausage","Licorice","Candy"]]
+  	["Stawnichy's","1. Any",["Cabbage Rolls - Sweet","Cabbage Rolls - Sour","Garlic Sausage","Licorice","Candy"]],
 	]}
 {v:5,items:[
-	["Other","1. Any",["Amazon Hair Powder"]]
+	["Other","1. Any",["Amazon Hair Powder"]],
   	]}
 ];
