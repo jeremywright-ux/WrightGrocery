@@ -11,7 +11,7 @@ window.SEED=[
 	["Costco","6. Frozen & Cooler",["Cheddar Cheese","Cheese Slice","Shredded Cheese - Nacho","Shredded Cheese - Nacho","Bacon","Ready Crisp","Fries","Corn Dogs"]],
 	["Costco","7. Drinks",["Pop","Blue Monkey","Bubbly"]],
 	["Costco","8. Pantry",["Olive Oil","Almond Milk","Raisin Bran","Cheerios","All Bran","Lemon Juice","Chia","Jam","Cheeze Whiz","Ketchup","Syrup","Panko","Croutons","Sea Salt - Coarse","Sea Salt - Fine","Garlic Bread Mix","Chips","Nachos","Chicago Mix","Pretzels","Gogo Squeeze","Mandarins"]],
-	["Costco","9. Personal",["Shampoo","Conditioner","Body Wash","Bar Soap","Toothpaste","Allergy Medecine","Vitamins"]]
+	["Costco","9. Personal",["Shampoo","Conditioner","Body Wash","Bar Soap","Toothpaste","Allergy Medicine","Vitamins"]]
 	]},
 {v:2,items:[
 	["Superstore","1. Personal",["Deodorant","Loofa","Makeup","Medicine","Tampons","Pads"]],
@@ -25,7 +25,7 @@ window.SEED=[
 	["Superstore","5. d) Baking, Snacks, Breakfast",["WW Flour","AP Flour","Apple Sauce","Canned Pumpkin","Kashi Bars","Red Berry","All Bran","Early Grey","Chai","Orange Peko","Flax Meal"]],
 	["Superstore","5. e) Spices",["5 Spice","Allspice","Basil - Dried)","Chili Powder","Cumin - ground","Cumin - Seed","Curry Powder","Garlic Powder","Onion Powder","Coriander - Ground","Coriander - Seed","Ground Ginger","Cardamom - Ground","Mint - Dried","Oregano - Dried","Paprika - Regular","Paprika - Smoked","Thyme - Dried"]],
 	["Superstore","6. Frozen",["Hash Brown Patties","Shredded Hash Browns","Tater Tots","Fish Sticks","Edemame","Frozen Peas","Frozen Corn","Frozen Mango","Frozen Pinapple","Frozen Strawberries","Ice Cream","Ice Cream Sandwiches","Popsicles","Perogies"]],
-	["Superstore","7. Dairy & Cheese",["Buttermilk","Orange Juice","Whipping Cream","Black Diamond Cheese Strings","Shredded Cheese - Mozza","Shredded Cheese - Nacho/Mix","Cream Cheese Spread","Flavoured Yogurt","Plain Yogurt","Cottage Cheese","Sour Cream"]],
+	["Superstore","7. Dairy & Cheese",["Buttermilk","Orange Juice","Whipping Cream","Black Diamond Cheese Strings","Shredded Cheese - Mozza","Shredded Cheese - Nacho/Mix","Cream Cheese Spread","Flavoured Yogurt","Plain Yogurt","Cottage Cheese","Sour Cream","Margarine"]],
 	["Superstore","8. Bakery",["French Bread","Naan","Wraps","Sour Dough","WW Bread","Dinner Buns","Hamburger Buns","HD Buns","Bagels","English Muffins"]]
 	]},
 {v:3,items:[
