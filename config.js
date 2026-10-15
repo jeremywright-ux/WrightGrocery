@@ -10,3 +10,4 @@ window.FIREBASE_CONFIG = {
 };
 // Both phones use this same ID, so keep the site address and this file to yourselves.
 window.LIST_ID = "keHQdaLO2onIL8qo2XU";
+window.STORE_ORDER = ["Costco", "Superstore", "Italian Centre", "Stawnichy's"];
