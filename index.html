@@ -108,7 +108,7 @@ body>*:not(#print){display:none!important}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const nat=(a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"});
-const VER=14;let _ord;
+const VER=15;let _ord;
 const sOrd=(a,b)=>{const o=_ord||(_ord=(window.STORE_ORDER||[...new Set((window.SEED||[]).flatMap(t=>t.items.map(x=>x[0])))]).map(x=>x.toLowerCase())),i=o.indexOf(a.toLowerCase()),j=o.indexOf(b.toLowerCase());return(i<0?1e9:i)-(j<0?1e9:j)||nat(a,b)};
 const STEP={g:50,ml:50,kg:.5,L:.5,l:.5,lb:.5},step=u=>STEP[u]??1;
 const num=q=>{q=parseFloat(q);return isNaN(q)?"":+q.toFixed(2)};
@@ -155,7 +155,7 @@ function pickHtml(){
     for(const a of Object.keys(g[s]).sort(nat))h+=`<h3>${esc(a)}<button class="rn" data-act="rn" data-s="${esc(s)}" data-v="${esc(a)}">Rename</button></h3><ul>`+g[s][a].sort((x,y)=>nat(x.name,y.name)).map(row).join("")+`</ul>`;
   }
   const dn=dupIds().length;
-  return h+(dn?`<button class="link" data-act="dedupe">Remove ${dn} duplicate item${dn>1?"s":""}</button>`:"")+`<button class="link" data-act="copyseed">Copy catalog as a new seed.js</button>`;
+  return h+(dn?`<button class="link" data-act="dedupe">Remove ${dn} duplicate item${dn>1?"s":""}</button>`:"")+`<button class="link" data-act="copyseed">Copy catalog as a new seed.js</button>`+(window.SEED?`<button class="link" data-act="reset">Replace catalog with seed.js…</button>`:"");
 }
 function shopHtml(){
   const rows=Object.entries(S.trip).filter(([id])=>S.catalog[id]).map(([id,t])=>({id,...S.catalog[id],...t}));
@@ -173,6 +173,18 @@ function dupIds(){
   for(const[id,c]of Object.entries(S.catalog))(g[(key(c)+"|"+String(c.name).trim()).toLowerCase()]??=[]).push(id);
   for(const ids of Object.values(g))if(ids.length>1){ids.sort((a,b)=>(!S.trip[a]-!S.trip[b])||a.localeCompare(b));del.push(...ids.slice(1))}
   return del;
+}
+function resetFromSeed(){
+  if(!window.SEED){alert("seed.js didn't load, so there is nothing to replace the catalog with.");return}
+  const ch=seedItems(0,true),cat={};
+  for(const[p,v]of Object.entries(ch))cat[p.slice(8)]=v;
+  const st=[...new Set(Object.values(cat).map(c=>c.store))];
+  if(!confirm("Replace the shared catalog with the "+Object.keys(cat).length+" items in seed.js ("+st.join(", ")+")?\n\nThis changes the list on every device. Items you added or edited in the app that aren't in seed.js will be removed. Your current shopping list is kept where the item names match."))return;
+  const nk=new Map(Object.entries(cat).map(([id,c])=>[(c.store+"|"+c.name).toLowerCase().trim(),id])),trip={};
+  for(const[id,t]of Object.entries(S.trip)){const c=S.catalog[id],nid=c&&nk.get((key(c)+"|"+c.name).toLowerCase().trim());if(nid)trip[nid]=t}
+  S={catalog:cat,trip};cache();render();
+  try{localStorage.setItem("seedv",seedTop())}catch(e){}
+  if(ref)ref.update({catalog:cat,trip,seedv:seedTop()}).catch(fail);
 }
 function seedText(){
   const g=group(items()),rows=[];
@@ -213,6 +225,7 @@ $("#main").addEventListener("click",e=>{
   else if(a==="got")apply({["trip."+id]:{...t,got:!t.got}});
   else if(a==="flt"){flt=b.dataset.v;render()}
   else if(a==="shopst"){shopStore=b.dataset.v;render()}
+  else if(a==="reset")resetFromSeed();
   else if(a==="dedupe"){const d=dupIds();if(!d.length){alert("No duplicates found.");return}if(!confirm("Remove "+d.length+" duplicate item"+(d.length>1?"s":"")+"? One copy of each stays."))return;const ch={};for(const i of d){ch["catalog."+i]=undefined;ch["trip."+i]=undefined}apply(ch)}
   else if(a==="copyseed"){const t=seedText();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>alert("Copied. On GitHub, open seed.js, click the pencil, select all, paste, then commit.")).catch(()=>prompt("Copy this text into seed.js:",t))}
   else if(a==="seed"){apply(seedItems(0));if(ref)ref.update({seedv:seedTop()}).catch(fail);try{localStorage.setItem("seedv",seedTop())}catch(e){}}
@@ -281,9 +294,9 @@ $("#f").onsubmit=e=>{
 };
 
 const seedTop=()=>Math.max(0,...(window.SEED||[]).map(b=>b.v));
-function seedItems(from){
-  const have=new Set(Object.values(S.catalog).map(c=>((c.store||"")+"|"+c.name).toLowerCase())),ch={};
-  for(const b of window.SEED||[])if(b.v>from){let n=0;for(const[s,a,ns]of b.items)for(const x of ns){n++;const[nm,q=1,u=""]=Array.isArray(x)?x:[x],id="s_"+(s+"_"+nm).toLowerCase().replace(/[^a-z0-9]+/g,"_"),k=(s+"|"+nm).toLowerCase();if(!have.has(k)&&!S.catalog[id]){have.add(k);ch["catalog."+id]={name:nm,store:s,aisle:a,qty:q,unit:u}}}}
+function seedItems(from,fresh){
+  const have=new Set(fresh?[]:Object.values(S.catalog).map(c=>((c.store||"")+"|"+c.name).toLowerCase())),ch={};
+  for(const b of window.SEED||[])if(b.v>from){let n=0;for(const[s,a,ns]of b.items)for(const x of ns){n++;const[nm,q=1,u=""]=Array.isArray(x)?x:[x],id="s_"+(s+"_"+nm).toLowerCase().replace(/[^a-z0-9]+/g,"_"),k=(s+"|"+nm).toLowerCase();if(!have.has(k)&&(fresh||!S.catalog[id])){have.add(k);ch["catalog."+id]={name:nm,store:s,aisle:a,qty:q,unit:u}}}}
   return ch;
 }
 function seedLocal(){
