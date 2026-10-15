@@ -10,15 +10,16 @@ window.SEED=[
 	["Costco","5. (b) Dairy & Cheese",["Butter","Cream 10%","Milk","Protein Milk"]],
 	["Costco","6. Frozen & Cooler",["Cheddar Cheese","Cheese Slice","Shredded Cheese - Nacho","Shredded Cheese - Nacho","Bacon","Ready Crisp","Fries","Corn Dogs"]],
 	["Costco","7. Drinks",["Pop","Blue Monkey","Bubbly"]],
-	["Costco","8. Pantry",["Olive Oil","Almond Milk","Raisin Bran","Cheerios","All Bran","Lemon Juice","Chia","Jam","Cheeze Whiz","Ketchup","Syrup","Panko","Croutons","Sea Salt - Coarse","Sea Salt - Fine","Garlic Bread Mix","Chips","Nachos","Pretzels","Gogo Squeeze","Mandarins"]],
+	["Costco","8. Pantry",["Olive Oil","Almond Milk","Raisin Bran","Cheerios","All Bran","Lemon Juice","Chia","Jam","Cheeze Whiz","Ketchup","Syrup","Panko","Croutons","Sea Salt - Coarse","Sea Salt - Fine","Garlic Bread Mix","Chips","Nachos","Chicago Mix","Pretzels","Gogo Squeeze","Mandarins"]],
+	["Costco","9. Personal",["Shampoo","Conditioner","Body Wash","Bar Soap","Toothpaste","Allergy Medecine","Vitamins"]]
 	]},
 {v:2,items:[
-	["Superstore","1. Personal",["Deodorant","Makeup","Medecine","Tampons","Pads"]],
+	["Superstore","1. Personal",["Deodorant","Loofa","Makeup","Medicine","Tampons","Pads"]],
 	["Superstore","2. a) Produce",["Fruit","Peppers","Mushrooms","Head Lettuce","Jalapeño","Lemons","Limes","Bananas","Broccoli","Cauliflower","Fennel","Celery","Green Onion","Red Leaf Lettuce","Green Leaf Lettuce","Mint - fresh","Thyme - fresh","Cilantro"]],
 	["Superstore","2. b) Produce",["Carrots","Cucumber","Basil - fresh","Tomato - cherry","Tomato - regular","Garlic","Onion - Red","Onion - White","Onion - Yellow","Shallots","Romaine","Snap Peas","Spinach","Arugula","Rene's Caesar Dressing"]],
 	["Superstore","3. Supplies",["White Out","Compost Bags","Garbage Bags - Bathroom","Laundry Pods","Light Bulbs","Oxi-Clean"]],
 	["Superstore","4. Meat & Deli",["Olives","Boursanne Cheese","Salami","Pepperoni - Sticks","Pepperoni - Pizza","Sliced Cheese","Sliced Ham","Deli Cheese","Feta","Ground Beef/Pork","Breakfast Sausage","Hot Dogs","Smokies","Shrimp"]],
-	["Superstore","5. a) Drinks and Treats",["Bubbly","Candy","Chips","Juice","Popcorn Shaker","Revels","Sparkling Water"]],
+	["Superstore","5. a) Drinks and Treats",["Candy","Wine Gums","Werthers","Super Nibs","Chips","Bubbly","Juice","Popcorn Shaker","Revels","Sparkling Water"]],
 	["Superstore","5. b) Condiments, Canned goods, Broth, etc",["BBQ Sauce","Mayo","Mustard","Broth - Beef","Broth - Chicken","Broth - Veggie","Chicken Noodle Soup","Cream of Chicken Soup","Mushroom Soup","Tomato Soup","Crushed Tomato","Jalapeños - Jarred","Pickles - dill","Pickles - sweet","Uncle Ben's Rice","Balsamic Vinegar","Red Wine Vinegar","White Wine Vinegar","Sherry Cooking Wine","White Vinegar","Canola Oil","Chickpeas - Canned","White Kidney Beans - Canned","Red Kidney Beans - Canned","Black Beans - Canned","Split Red Lentils","Black Beans - Dried"]],
 	["Superstore","5. c) Asian, Pasta, Sauces, Etc.",["Bulgogi Marinade","Rice Vinegar","Chilli Oil/Chilli Crisp","Coconut Milk","Coriander Chutney","Mirin","Kewpie Mayo","Siracha","Crispy Onion","Tandoori Masala","Garam Masala","Cardamom - Pods","Egg Noodles","Fajita Spice","Noodle - Fusili","Noodles - Bowties","Noodles - Fettuccini","Noodles - Linguine","Noodles - Penne","Noodles - Spaghetti","Pasta Sauce","Pocky","Rice (brown basmati)","Rice (white jasmine)","Rice Vinnegar","Sesame Oil","Sesame Seeds","Soy Sauce","Strained Tom","Tomato Paste","Cremas","Green Chillis","Taco Shells"]],
 	["Superstore","5. d) Baking, Snacks, Breakfast",["WW Flour","AP Flour","Apple Sauce","Canned Pumpkin","Kashi Bars","Red Berry","All Bran","Early Grey","Chai","Orange Peko","Flax Meal"]],
@@ -28,9 +29,12 @@ window.SEED=[
 	["Superstore","8. Bakery",["French Bread","Naan","Wraps","Sour Dough","WW Bread","Dinner Buns","Hamburger Buns","HD Buns","Bagels","English Muffins"]]
 	]},
 {v:3,items:[
-  	["Italian Centre","1. Deli",["Parm","Olives","Deli Meat"]]
+  	["Italian Centre","1. Deli",["Parm","Olives","Deli Meat","Licorice","Candy"]]
   	]},
 {v:4,items:[
-  	["Stawnichy's","1. Any",["Cabbage Rolls - Sweet","Cabbage Rolls - Sour","Garlic Sausage"]]
+  	["Stawnichy's","1. Any",["Cabbage Rolls - Sweet","Cabbage Rolls - Sour","Garlic Sausage","Licorice","Candy"]]
+	]}
+{v:5,items:[
+	["Other","1. Any",["Amazon Hair Powder"]]
   	]}
 ];
