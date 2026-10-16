@@ -27,6 +27,6 @@ window.SEED=[
 ["Superstore","8. Bakery",["French Bread","Naan","Wraps","Sour Dough","WW Bread","Dinner Buns","Hamburger Buns","HD Buns","Bagels","English Muffins"]],
 ["Italian Centre","1. Deli",["Parm","Olives","Deli Meat","Licorice","Candy"]],
 ["Stawnichy's","1. Any",["Cabbage Rolls - Sweet","Cabbage Rolls - Sour","Garlic Sausage","Licorice","Candy"]],
-["Other","1. Items",["Amazon Hair Powder","Beer","Red Wine"]]
+["Other","1. Items",["Amazon Hair Powder","Beer","Red Wine"]],
 ]}
 ];
