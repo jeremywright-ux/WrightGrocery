@@ -64,6 +64,14 @@ nav b:empty{display:none}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .acts{display:flex;gap:8px;flex-wrap:wrap}
 .acts .btn{flex:1}
+h3.sec{display:flex;align-items:center;justify-content:space-between}
+.tg{flex:1;display:flex;align-items:center;gap:6px;border:0;background:none;color:var(--green);font:inherit;font-size:14px;font-weight:600;text-align:left;padding:8px 0;min-height:36px}
+.tg .chev{display:inline-block;font-size:12px;transition:transform .15s}
+.tg[aria-expanded=false] .chev{transform:rotate(-90deg)}
+.tg small{color:var(--mute);font-weight:400;font-size:13px;margin-left:4px}
+ul[hidden]{display:none}
+.cols{display:flex;gap:14px;justify-content:flex-end;padding:6px 2px 0}
+.cols button{border:0;background:none;color:var(--mute);font:inherit;font-size:14px;text-decoration:underline;padding:4px}
 .rn{border:0;background:none;color:var(--mute);font:inherit;font-size:13px;font-weight:400;margin-left:8px;text-decoration:underline;padding:4px}
 #print{display:none}
 @page{size:letter landscape;margin:.35in}
@@ -108,7 +116,7 @@ body>*:not(#print){display:none!important}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const nat=(a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"});
-const VER=15;let _ord;
+const VER=16;let _ord;
 const sOrd=(a,b)=>{const o=_ord||(_ord=(window.STORE_ORDER||[...new Set((window.SEED||[]).flatMap(t=>t.items.map(x=>x[0])))]).map(x=>x.toLowerCase())),i=o.indexOf(a.toLowerCase()),j=o.indexOf(b.toLowerCase());return(i<0?1e9:i)-(j<0?1e9:j)||nat(a,b)};
 const STEP={g:50,ml:50,kg:.5,L:.5,l:.5,lb:.5},step=u=>STEP[u]??1;
 const num=q=>{q=parseFloat(q);return isNaN(q)?"":+q.toFixed(2)};
@@ -135,6 +143,13 @@ function apply(ch){
   if(ref){const D=firebase.firestore.FieldValue.delete(),o={};for(const[p,v]of Object.entries(ch))o[p]=v===undefined?D:v;ref.update(o).catch(fail)}
 }
 
+const COLS=`<div class="cols"><button data-act="tgall" data-v="close">Collapse all</button><button data-act="tgall" data-v="open">Expand all</button></div>`;
+let closed=new Set();try{closed=new Set(JSON.parse(localStorage.getItem("closed")||"[]"))}catch(e){}
+const saveClosed=()=>{try{localStorage.setItem("closed",JSON.stringify([...closed]))}catch(e){}};
+function secKeys(){
+  if(view==="pick")return items().map(i=>"p|"+key(i)+"|"+ais(i));
+  return Object.keys(S.trip).filter(id=>S.catalog[id]).map(id=>S.catalog[id]).filter(c=>key(c)===shopStore).map(c=>"s|"+key(c)+"|"+ais(c));
+}
 function row(i){
   const t=S.trip[i.id],d=`data-id="${i.id}"`;
   return `<li class="${t?"on":""}"><button class="tick" data-act="tog" ${d} aria-label="Toggle ${esc(i.name)}"></button><span class="txt" data-act="tog" ${d}>${esc(i.name)}</span>`+
@@ -149,10 +164,14 @@ function pickHtml(){
   if(!all.length)return h+`<div class="empty">Your catalog is empty.<br>`+(window.SEED?`<button class="btn" data-act="seed" style="margin:14px 0">Load starter list</button><br>`:`<br>The starter file seed.js didn't load. Check it is uploaded next to index.html on GitHub.<br><br>`)+`Or tap New item to add one yourself.</div>`;
   const f=all.filter(i=>(!flt||key(i)===flt)&&i.name.toLowerCase().includes(q.trim().toLowerCase()));
   if(!f.length)return h+`<div class="empty">No matches.</div>`;
+  h+=COLS;
   const g=group(f);
   for(const s of Object.keys(g).sort(sOrd)){
     h+=`<h2>${esc(s)}<button class="rn" data-act="rn" data-s="${esc(s)}" data-v="">Rename</button></h2>`;
-    for(const a of Object.keys(g[s]).sort(nat))h+=`<h3>${esc(a)}<button class="rn" data-act="rn" data-s="${esc(s)}" data-v="${esc(a)}">Rename</button></h3><ul>`+g[s][a].sort((x,y)=>nat(x.name,y.name)).map(row).join("")+`</ul>`;
+    for(const a of Object.keys(g[s]).sort(nat)){
+      const k="p|"+s+"|"+a,cl=!q.trim()&&closed.has(k),its=g[s][a].sort((x,y)=>nat(x.name,y.name)),pc=its.filter(i=>S.trip[i.id]).length;
+      h+=`<h3 class="sec"><button class="tg" data-act="tg" data-k="${esc(k)}" aria-expanded="${!cl}"><span class="chev">▾</span>${esc(a)}<small>${pc?pc+" of "+its.length:its.length}</small></button><button class="rn" data-act="rn" data-s="${esc(s)}" data-v="${esc(a)}">Rename</button></h3><ul${cl?" hidden":""}>`+its.map(row).join("")+`</ul>`;
+    }
   }
   const dn=dupIds().length;
   return h+(dn?`<button class="link" data-act="dedupe">Remove ${dn} duplicate item${dn>1?"s":""}</button>`:"")+`<button class="link" data-act="copyseed">Copy catalog as a new seed.js</button>`+(window.SEED?`<button class="link" data-act="reset">Replace catalog with seed.js…</button>`:"");
@@ -163,8 +182,9 @@ function shopHtml(){
   const stores=[...new Set(rows.map(key))].sort(sOrd);
   if(!stores.includes(shopStore))shopStore=stores[0];
   let h=`<div class="chips">`+stores.map(s=>`<button class="seg ${s===shopStore?"on":""}" data-act="shopst" data-v="${esc(s)}">${esc(s)}<small>${rows.filter(r=>key(r)===s&&!r.got).length}</small></button>`).join("")+`</div>`;
+  h+=COLS;
   const mine=rows.filter(r=>key(r)===shopStore),g=group(mine)[shopStore];
-  for(const a of Object.keys(g).sort(nat))h+=`<h3>${esc(a)}</h3><ul>`+g[a].sort((x,y)=>(!!x.got-!!y.got)||oCmp(x,y)).map(r=>`<li class="${r.got?"done":""}" data-act="got" data-id="${r.id}" role="button" tabindex="0"><span class="tick"></span><span class="txt">${esc(r.name)}</span><b class="qty">${fmt(r.qty,r.unit)}</b></li>`).join("")+`</ul>`;
+  for(const a of Object.keys(g).sort(nat)){const k="s|"+shopStore+"|"+a,cl=closed.has(k),left=g[a].filter(r=>!r.got).length;h+=`<h3 class="sec"><button class="tg" data-act="tg" data-k="${esc(k)}" aria-expanded="${!cl}"><span class="chev">▾</span>${esc(a)}<small>${left?left+" left":"done"}</small></button></h3><ul${cl?" hidden":""}>`+g[a].sort((x,y)=>(!!x.got-!!y.got)||oCmp(x,y)).map(r=>`<li class="${r.got?"done":""}" data-act="got" data-id="${r.id}" role="button" tabindex="0"><span class="tick"></span><span class="txt">${esc(r.name)}</span><b class="qty">${fmt(r.qty,r.unit)}</b></li>`).join("")+`</ul>`;}
   if(mine.some(r=>r.got))h+=`<button class="link" data-act="clrgot">Remove bought items from ${esc(shopStore)}</button>`;
   return h+`<button class="link" data-act="print">Print lists (landscape, half page per store)</button><button class="link" data-act="clrall">Clear the whole trip</button>`;
 }
@@ -225,6 +245,8 @@ $("#main").addEventListener("click",e=>{
   else if(a==="got")apply({["trip."+id]:{...t,got:!t.got}});
   else if(a==="flt"){flt=b.dataset.v;render()}
   else if(a==="shopst"){shopStore=b.dataset.v;render()}
+  else if(a==="tg"){const k=b.dataset.k;closed.has(k)?closed.delete(k):closed.add(k);saveClosed();render()}
+  else if(a==="tgall"){for(const k of secKeys())b.dataset.v==="close"?closed.add(k):closed.delete(k);saveClosed();render()}
   else if(a==="reset")resetFromSeed();
   else if(a==="dedupe"){const d=dupIds();if(!d.length){alert("No duplicates found.");return}if(!confirm("Remove "+d.length+" duplicate item"+(d.length>1?"s":"")+"? One copy of each stays."))return;const ch={};for(const i of d){ch["catalog."+i]=undefined;ch["trip."+i]=undefined}apply(ch)}
   else if(a==="copyseed"){const t=seedText();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>alert("Copied. On GitHub, open seed.js, click the pencil, select all, paste, then commit.")).catch(()=>prompt("Copy this text into seed.js:",t))}
