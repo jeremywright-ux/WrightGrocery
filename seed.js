@@ -13,7 +13,7 @@ window.SEED=[
 ["Costco","8. Pantry",["Olive Oil","Almond Milk","Raisin Bran","Cheerios","All Bran","Lemon Juice","Chia","Jam","Cheeze Whiz","Ketchup","Syrup","Panko","Croutons","Sea Salt - Coarse","Sea Salt - Fine","Garlic Bread Mix","Chips","Nachos","Chicago Mix","Pretzels","Gogo Squeeze","Mandarins","Annies Macaroni"]],
 ["Costco","9. Personal",["Shampoo","Conditioner","Body Wash","Bar Soap","Toothpaste","Vitamins","Allergy Medecine"]],
 ["Superstore","1. Personal",["Deodorant","Loofa","Makeup","Medicine","Tampons","Pads","Razor Blades - Jess"]],
-["Superstore","2. a) Produce",["Fruit","Peppers","Mushrooms","Head Lettuce","Jalapeño","Lemons","Limes","Bananas","Broccoli","Cauliflower","Fennel","Celery","Green Onion","Red Leaf Lettuce","Green Leaf Lettuce","Mint - fresh","Thyme - fresh","Cilantro","Parsley"]],
+["Superstore","2. a) Produce",["Fruit","Peppers","Mushrooms","Head Lettuce","Jalapeño","Lemons","Limes","Bananas","Broccoli","Cauliflower","Fennel","Celery","Green Onion","Red Leaf Lettuce","Green Leaf Lettuce","Mint - fresh","Thyme - fresh","Cilantro","Parsley - fresh"]],
 ["Superstore","2. b) Produce",["Carrots","Cucumber","Basil - fresh","Tomato - cherry","Tomato - regular","Garlic","Onion - Red","Onion - White","Onion - Yellow","Shallots","Romaine","Snap Peas","Spinach","Arugula","Rene's Caesar Dressing"]],
 ["Superstore","3. Supplies",["White Out","Compost Bags","Garbage Bags - Bathroom","Laundry Pods","Light Bulbs","Oxi-Clean"]],
 ["Superstore","4. Meat & Deli",["Olives","Boursanne Cheese","Salami","Pepperoni - Sticks","Pepperoni - Pizza","Sliced Cheese","Sliced Ham","Deli Cheese","Feta","Ground Beef/Pork","Breakfast Sausage","Hot Dogs","Smokies","Shrimp"]],
