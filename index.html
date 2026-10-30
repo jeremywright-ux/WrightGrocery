@@ -70,6 +70,8 @@ h3.sec{display:flex;align-items:center;justify-content:space-between}
 .tg[aria-expanded=false] .chev{transform:rotate(-90deg)}
 .tg small{color:var(--mute);font-weight:400;font-size:13px;margin-left:4px}
 ul[hidden]{display:none}
+.note{display:block;font-size:14px;color:var(--mute);margin-top:2px;overflow-wrap:anywhere}
+.note.add{color:var(--green);text-decoration:underline;font-size:13px}
 .cols{display:flex;gap:14px;justify-content:flex-end;padding:6px 2px 0}
 .cols button{border:0;background:none;color:var(--mute);font:inherit;font-size:14px;text-decoration:underline;padding:4px}
 .rn{border:0;background:none;color:var(--mute);font:inherit;font-size:13px;font-weight:400;margin-left:8px;text-decoration:underline;padding:4px}
@@ -92,6 +94,7 @@ body>*:not(#print){display:none!important}
 .pi{display:flex;gap:5pt;align-items:baseline;break-inside:avoid}
 .pi i{flex:none;width:8pt;height:8pt;border:1pt solid #000}
 .pi span{flex:1}.pi em{font-style:normal;font-weight:700}
+.pi small{font-style:italic}
 }
 </style>
 </head>
@@ -116,7 +119,7 @@ body>*:not(#print){display:none!important}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const nat=(a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"});
-const VER=16;let _ord;
+const VER=17;let _ord;
 const sOrd=(a,b)=>{const o=_ord||(_ord=(window.STORE_ORDER||[...new Set((window.SEED||[]).flatMap(t=>t.items.map(x=>x[0])))]).map(x=>x.toLowerCase())),i=o.indexOf(a.toLowerCase()),j=o.indexOf(b.toLowerCase());return(i<0?1e9:i)-(j<0?1e9:j)||nat(a,b)};
 const STEP={g:50,ml:50,kg:.5,L:.5,l:.5,lb:.5},step=u=>STEP[u]??1;
 const num=q=>{q=parseFloat(q);return isNaN(q)?"":+q.toFixed(2)};
@@ -152,7 +155,7 @@ function secKeys(){
 }
 function row(i){
   const t=S.trip[i.id],d=`data-id="${i.id}"`;
-  return `<li class="${t?"on":""}"><button class="tick" data-act="tog" ${d} aria-label="Toggle ${esc(i.name)}"></button><span class="txt" data-act="tog" ${d}>${esc(i.name)}</span>`+
+  return `<li class="${t?"on":""}"><button class="tick" data-act="tog" ${d} aria-label="Toggle ${esc(i.name)}"></button><span class="txt" data-act="tog" ${d}>${esc(i.name)}${t?`<small class="note${t.note?"":" add"}" data-act="note" ${d}>${t.note?esc(t.note):"+ note"}</small>`:""}</span>`+
   (t?`<span class="step"><button data-act="dec" ${d} aria-label="Less">−</button><b>${fmt(t.qty,t.unit)}</b><button data-act="inc" ${d} aria-label="More">+</button></span>`:`<span class="def">${fmt(i.qty,i.unit)}</span>`)+
   `<button class="ed" data-act="edit" ${d} aria-label="Edit ${esc(i.name)}">✎</button></li>`;
 }
@@ -184,7 +187,7 @@ function shopHtml(){
   let h=`<div class="chips">`+stores.map(s=>`<button class="seg ${s===shopStore?"on":""}" data-act="shopst" data-v="${esc(s)}">${esc(s)}<small>${rows.filter(r=>key(r)===s&&!r.got).length}</small></button>`).join("")+`</div>`;
   h+=COLS;
   const mine=rows.filter(r=>key(r)===shopStore),g=group(mine)[shopStore];
-  for(const a of Object.keys(g).sort(nat)){const k="s|"+shopStore+"|"+a,cl=closed.has(k),left=g[a].filter(r=>!r.got).length;h+=`<h3 class="sec"><button class="tg" data-act="tg" data-k="${esc(k)}" aria-expanded="${!cl}"><span class="chev">▾</span>${esc(a)}<small>${left?left+" left":"done"}</small></button></h3><ul${cl?" hidden":""}>`+g[a].sort((x,y)=>(!!x.got-!!y.got)||oCmp(x,y)).map(r=>`<li class="${r.got?"done":""}" data-act="got" data-id="${r.id}" role="button" tabindex="0"><span class="tick"></span><span class="txt">${esc(r.name)}</span><b class="qty">${fmt(r.qty,r.unit)}</b></li>`).join("")+`</ul>`;}
+  for(const a of Object.keys(g).sort(nat)){const k="s|"+shopStore+"|"+a,cl=closed.has(k),left=g[a].filter(r=>!r.got).length;h+=`<h3 class="sec"><button class="tg" data-act="tg" data-k="${esc(k)}" aria-expanded="${!cl}"><span class="chev">▾</span>${esc(a)}<small>${left?left+" left":"done"}</small></button></h3><ul${cl?" hidden":""}>`+g[a].sort((x,y)=>(!!x.got-!!y.got)||oCmp(x,y)).map(r=>`<li class="${r.got?"done":""}" data-act="got" data-id="${r.id}" role="button" tabindex="0"><span class="tick"></span><span class="txt">${esc(r.name)}${r.note?`<small class="note">${esc(r.note)}</small>`:""}</span><b class="qty">${fmt(r.qty,r.unit)}</b><button class="ed" data-act="note" data-id="${r.id}" aria-label="Note for ${esc(r.name)}">✎</button></li>`).join("")+`</ul>`;}
   if(mine.some(r=>r.got))h+=`<button class="link" data-act="clrgot">Remove bought items from ${esc(shopStore)}</button>`;
   return h+`<button class="link" data-act="print">Print lists (landscape, half page per store)</button><button class="link" data-act="clrall">Clear the whole trip</button>`;
 }
@@ -218,7 +221,7 @@ function printHtml(){
   const cards=[...new Set(rows.map(key))].sort(sOrd).map(s=>{
     const g=group(rows.filter(r=>key(r)===s))[s],as=Object.keys(g).sort(nat);
     const n=as.length+as.reduce((x,k)=>x+g[k].length,0),cols=Math.min(3,Math.ceil(n/40)||1);
-    return `<section class="ps"><div class="ph"><b>${esc(s)}</b><span>${d}</span></div><div class="pc" style="column-count:${cols}">`+as.map(a=>`<h4>${esc(a)}</h4>`+g[a].sort(oCmp).map(r=>`<div class="pi"><i></i><span>${esc(r.name)}</span><em>${fmt(r.qty,r.unit)}</em></div>`).join("")).join("")+`</div></section>`;
+    return `<section class="ps"><div class="ph"><b>${esc(s)}</b><span>${d}</span></div><div class="pc" style="column-count:${cols}">`+as.map(a=>`<h4>${esc(a)}</h4>`+g[a].sort(oCmp).map(r=>`<div class="pi"><i></i><span>${esc(r.name)}${r.note?` <small>— ${esc(r.note)}</small>`:""}</span><em>${fmt(r.qty,r.unit)}</em></div>`).join("")).join("")+`</div></section>`;
   });
   let out="";for(let i=0;i<cards.length;i+=2)out+=`<div class="pg">`+cards.slice(i,i+2).join("")+"</div>";
   return out;
@@ -245,6 +248,7 @@ $("#main").addEventListener("click",e=>{
   else if(a==="got")apply({["trip."+id]:{...t,got:!t.got}});
   else if(a==="flt"){flt=b.dataset.v;render()}
   else if(a==="shopst"){shopStore=b.dataset.v;render()}
+  else if(a==="note"){if(!t)return;const nn=prompt("Note for "+c.name,t.note||"");if(nn===null)return;apply({["trip."+id]:{...t,note:nn.trim()}})}
   else if(a==="tg"){const k=b.dataset.k;closed.has(k)?closed.delete(k):closed.add(k);saveClosed();render()}
   else if(a==="tgall"){for(const k of secKeys())b.dataset.v==="close"?closed.add(k):closed.delete(k);saveClosed();render()}
   else if(a==="reset")resetFromSeed();
