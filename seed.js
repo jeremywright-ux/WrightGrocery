@@ -24,7 +24,7 @@ window.SEED=[
 ["Superstore","5. e) Spices",["5 Spice","Allspice","Basil - Dried)","Chili Powder","Cumin - ground","Cumin - Seed","Curry Powder","Garlic Powder","Onion Powder","Coriander - Ground","Coriander - Seed","Ground Ginger","Cardamom - Ground","Mint - Dried","Oregano - Dried","Paprika - Regular","Paprika - Smoked","Thyme - Dried"]],
 ["Superstore","6. Frozen",["Hash Brown Patties","Shredded Hash Browns","Tater Tots","Fish Sticks","Edemame","Frozen Peas","Frozen Corn","Frozen Mango","Frozen Pinapple","Frozen Strawberries","Ice Cream","Ice Cream Sandwiches","Popsicles","Perogies","Peas","Pie Crust (large)"]],
 ["Superstore","7. Dairy & Cheese",["Buttermilk","Orange Juice","Whipping Cream","Black Diamond Cheese Strings","Shredded Cheese - Mozza","Shredded Cheese - Nacho/Mix","Cream Cheese Spread","Flavoured Yogurt","Plain Yogurt","Cottage Cheese","Margarine","Sour Cream (250 mL)","Sour Cream (500 mL)"]],
-["Superstore","8. Bakery",["French Bread","Naan","Wraps","Sour Dough","WW Bread","Dinner Buns","HD Buns","Bagels","English Muffins","Grilled Cheese Loaf","Hamburger Buns","Pulled Pork/Beef Buns"]],
+["Superstore","8. Bakery",["French Bread","Naan","Wraps","Sour Dough","WW Bread","Dinner Buns","HD Buns","Bagels","English Muffins","Grilled Cheese Loaf","Hamburger Buns","Pulled Pork/Beef Buns","Sour Dough","Grilled Cheese Loaf"]],
 ["Italian Centre","1. Deli",["Parm","Olives","Deli Meat","Licorice","Candy","Provolone"]],
 ["Stawnichy's","1. Any",["Cabbage Rolls - Sweet","Cabbage Rolls - Sour","Garlic Sausage","Licorice","Candy","Pickled Beets"]],
 ["Other","1. Items",["Amazon Hair Powder","Beer","Red Wine"]]
