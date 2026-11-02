@@ -70,6 +70,10 @@ h3.sec{display:flex;align-items:center;justify-content:space-between}
 .tg[aria-expanded=false] .chev{transform:rotate(-90deg)}
 .tg small{color:var(--mute);font-weight:400;font-size:13px;margin-left:4px}
 ul[hidden]{display:none}
+.tick.on{background:var(--green)}
+.tick.on::after{content:"✓"}
+h3.sec .sx{margin-right:8px}
+.fin .tg{color:var(--mute)}
 .note{display:block;font-size:14px;color:var(--mute);margin-top:2px;overflow-wrap:anywhere}
 .note.add{color:var(--green);text-decoration:underline;font-size:13px}
 .cols{display:flex;gap:14px;justify-content:flex-end;padding:6px 2px 0}
@@ -119,15 +123,15 @@ body>*:not(#print){display:none!important}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const nat=(a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"});
-const VER=17;let _ord;
+const VER=18;let _ord;
 const sOrd=(a,b)=>{const o=_ord||(_ord=(window.STORE_ORDER||[...new Set((window.SEED||[]).flatMap(t=>t.items.map(x=>x[0])))]).map(x=>x.toLowerCase())),i=o.indexOf(a.toLowerCase()),j=o.indexOf(b.toLowerCase());return(i<0?1e9:i)-(j<0?1e9:j)||nat(a,b)};
 const STEP={g:50,ml:50,kg:.5,L:.5,l:.5,lb:.5},step=u=>STEP[u]??1;
 const num=q=>{q=parseFloat(q);return isNaN(q)?"":+q.toFixed(2)};
 const fmt=(q,u)=>[num(q),u].filter(x=>x!=="").join(" ");
 const key=i=>i.store||"No store",ais=i=>i.aisle||"Other";
 const LABEL={local:"Not synced",saving:"Saving…",offline:"Offline",synced:"Synced",error:"Sync error"};
-let lastErr="",tried=false,S={catalog:{},trip:{}},view=localStorage.getItem("v")||"pick",flt="",shopStore="",q="",editing=null,more=false,ref=null,status="local",lastS="",lastA="";
-try{const c=JSON.parse(localStorage.getItem("g2"));if(c)S={catalog:c.catalog||{},trip:c.trip||{}}}catch(e){}
+let lastErr="",tried=false,S={catalog:{},trip:{},sdone:{}},view=localStorage.getItem("v")||"pick",flt="",shopStore="",q="",editing=null,more=false,ref=null,status="local",lastS="",lastA="";
+try{const c=JSON.parse(localStorage.getItem("g2"));if(c)S={catalog:c.catalog||{},trip:c.trip||{},sdone:c.sdone||{}}}catch(e){}
 const cache=()=>{try{localStorage.setItem("g2",JSON.stringify(S))}catch(e){}};
 const items=()=>Object.entries(S.catalog).map(([id,c])=>({id,...c}));
 let _si;
@@ -146,6 +150,7 @@ function apply(ch){
   if(ref){const D=firebase.firestore.FieldValue.delete(),o={};for(const[p,v]of Object.entries(ch))o[p]=v===undefined?D:v;ref.update(o).catch(fail)}
 }
 
+const sk=(s,a)=>(s+"_"+a).toLowerCase().replace(/[^a-z0-9]+/g,"_");
 const COLS=`<div class="cols"><button data-act="tgall" data-v="close">Collapse all</button><button data-act="tgall" data-v="open">Expand all</button></div>`;
 let closed=new Set();try{closed=new Set(JSON.parse(localStorage.getItem("closed")||"[]"))}catch(e){}
 const saveClosed=()=>{try{localStorage.setItem("closed",JSON.stringify([...closed]))}catch(e){}};
@@ -172,8 +177,8 @@ function pickHtml(){
   for(const s of Object.keys(g).sort(sOrd)){
     h+=`<h2>${esc(s)}<button class="rn" data-act="rn" data-s="${esc(s)}" data-v="">Rename</button></h2>`;
     for(const a of Object.keys(g[s]).sort(nat)){
-      const k="p|"+s+"|"+a,cl=!q.trim()&&closed.has(k),its=g[s][a].sort((x,y)=>nat(x.name,y.name)),pc=its.filter(i=>S.trip[i.id]).length;
-      h+=`<h3 class="sec"><button class="tg" data-act="tg" data-k="${esc(k)}" aria-expanded="${!cl}"><span class="chev">▾</span>${esc(a)}<small>${pc?pc+" of "+its.length:its.length}</small></button><button class="rn" data-act="rn" data-s="${esc(s)}" data-v="${esc(a)}">Rename</button></h3><ul${cl?" hidden":""}>`+its.map(row).join("")+`</ul>`;
+      const k="p|"+s+"|"+a,cl=!q.trim()&&closed.has(k),its=g[s][a].sort((x,y)=>nat(x.name,y.name)),pc=its.filter(i=>S.trip[i.id]).length,dn=!!S.sdone[sk(s,a)];
+      h+=`<h3 class="sec${dn?" fin":""}"><button class="tick sx${dn?" on":""}" data-act="sdone" data-k="${sk(s,a)}" aria-pressed="${dn}" aria-label="Mark ${esc(a)} as picked"></button><button class="tg" data-act="tg" data-k="${esc(k)}" aria-expanded="${!cl}"><span class="chev">▾</span>${esc(a)}<small>${pc?pc+" of "+its.length:its.length}</small></button><button class="rn" data-act="rn" data-s="${esc(s)}" data-v="${esc(a)}">Rename</button></h3><ul${cl?" hidden":""}>`+its.map(row).join("")+`</ul>`;
     }
   }
   const dn=dupIds().length;
@@ -205,7 +210,7 @@ function resetFromSeed(){
   if(!confirm("Replace the shared catalog with the "+Object.keys(cat).length+" items in seed.js ("+st.join(", ")+")?\n\nThis changes the list on every device. Items you added or edited in the app that aren't in seed.js will be removed. Your current shopping list is kept where the item names match."))return;
   const nk=new Map(Object.entries(cat).map(([id,c])=>[(c.store+"|"+c.name).toLowerCase().trim(),id])),trip={};
   for(const[id,t]of Object.entries(S.trip)){const c=S.catalog[id],nid=c&&nk.get((key(c)+"|"+c.name).toLowerCase().trim());if(nid)trip[nid]=t}
-  S={catalog:cat,trip};cache();render();
+  S={catalog:cat,trip,sdone:S.sdone||{}};cache();render();
   try{localStorage.setItem("seedv",seedTop())}catch(e){}
   if(ref)ref.update({catalog:cat,trip,seedv:seedTop()}).catch(fail);
 }
@@ -249,6 +254,7 @@ $("#main").addEventListener("click",e=>{
   else if(a==="flt"){flt=b.dataset.v;render()}
   else if(a==="shopst"){shopStore=b.dataset.v;render()}
   else if(a==="note"){if(!t)return;const nn=prompt("Note for "+c.name,t.note||"");if(nn===null)return;apply({["trip."+id]:{...t,note:nn.trim()}})}
+  else if(a==="sdone"){const k=b.dataset.k;apply({["sdone."+k]:S.sdone[k]?undefined:true})}
   else if(a==="tg"){const k=b.dataset.k;closed.has(k)?closed.delete(k):closed.add(k);saveClosed();render()}
   else if(a==="tgall"){for(const k of secKeys())b.dataset.v==="close"?closed.add(k):closed.delete(k);saveClosed();render()}
   else if(a==="reset")resetFromSeed();
@@ -268,7 +274,7 @@ $("#main").addEventListener("click",e=>{
     apply(ch);
   }
   else if(a==="clrgot"){const ch={};for(const[i,x]of Object.entries(S.trip))if(x.got&&S.catalog[i]&&key(S.catalog[i])===shopStore)ch["trip."+i]=undefined;apply(ch)}
-  else if(a==="clrall"&&confirm("Clear the whole trip list?")){const ch={};for(const i in S.trip)ch["trip."+i]=undefined;apply(ch)}
+  else if(a==="clrall"&&confirm("Clear the whole trip list?")){const ch={};for(const i in S.trip)ch["trip."+i]=undefined;for(const k in S.sdone)ch["sdone."+k]=undefined;apply(ch)}
 });
 $("nav").onclick=e=>{const b=e.target.closest("button");if(b){view=b.dataset.v;try{localStorage.setItem("v",view)}catch(x){}render();scrollTo(0,0)}};
 $("#sync").onclick=()=>{
@@ -347,7 +353,7 @@ async function initSync(){
     status="offline";
     ref.onSnapshot({includeMetadataChanges:true},snap=>{
       const d=snap.data()||{};
-      S={catalog:d.catalog||{},trip:d.trip||{}};cache();
+      S={catalog:d.catalog||{},trip:d.trip||{},sdone:d.sdone||{}};cache();
       const done=d.seedv??(d.seeded?1:0);
       if(!snap.metadata.fromCache&&window.SEED&&!tried&&done<seedTop()){tried=true;ref.update({seedv:seedTop()}).catch(fail);apply(seedItems(done))}
       status=lastErr?"error":snap.metadata.hasPendingWrites?"saving":snap.metadata.fromCache?"offline":"synced";
